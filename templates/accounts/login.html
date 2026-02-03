@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - TicketX{% endblock %}
+
+{% block content %}
+  <div style="max-width: 420px; margin: 4rem auto; padding: 2rem; background: rgba(30, 30, 40, 0.9); border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); color: #eee;">
+    <h2 style="text-align: center; margin-bottom: 1.8rem; color: #ff5252;">Login to TicketX</h2>
+
+    {% if form.errors %}
+      <p style="color: #ff6666; text-align: center; margin-bottom: 1rem;">
+        Invalid email or password. Please try again.
+      </p>
+    {% endif %}
+
+    {% if next %}
+      <p style="color: #ffcc00; text-align: center; margin-bottom: 1rem;">
+        Please login to continue.
+      </p>
+    {% endif %}
+
+    <form method="post" action="{% url 'accounts:login' %}">
+      {% csrf_token %}
+
+      <div style="margin-bottom: 1.5rem;">
+        <label for="id_username" style="display: block; margin-bottom: 0.5rem; color: #ccc;">Email</label>
+        <input type="email" name="username" id="id_username" required autofocus
+               style="width: 100%; padding: 0.8rem; border-radius: 6px; border: 1px solid #444; background: #222; color: #eee;">
+      </div>
+
+      <div style="margin-bottom: 1.8rem;">
+        <label for="id_password" style="display: block; margin-bottom: 0.5rem; color: #ccc;">Password</label>
+        <input type="password" name="password" id="id_password" required
+               style="width: 100%; padding: 0.8rem; border-radius: 6px; border: 1px solid #444; background: #222; color: #eee;">
+      </div>
+
+      <button type="submit" style="width: 100%; padding: 0.9rem; background: #d32f2f; color: white; border: none; border-radius: 6px; font-size: 1.05rem; cursor: pointer;">
+        Login
+      </button>
+
+      <input type="hidden" name="next" value="{{ next }}">
+    </form>
+
+    <p style="text-align: center; margin-top: 1.5rem; color: #aaa;">
+      Don't have an account? <a href="{% url 'accounts:register' %}" style="color: #ff9999;">Register</a>
+    </p>
+  </div>
+{% endblock %}

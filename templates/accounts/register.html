@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - TicketX{% endblock %}
+
+{% block content %}
+  <div style="max-width: 420px; margin: 4rem auto; padding: 2rem; background: rgba(30, 30, 40, 0.9); border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); color: #eee;">
+    <h2 style="text-align: center; margin-bottom: 1.8rem; color: #ff5252;">Create an Account</h2>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div style="padding: 0.8rem; margin-bottom: 1rem; border-radius: 6px; background: {% if message.tags == 'success' %}#2e7d32{% else %}#c62828{% endif %}; color: white; text-align: center;">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+
+      <div style="margin-bottom: 1.5rem;">
+        <label for="id_email" style="display: block; margin-bottom: 0.5rem; color: #ccc;">Email</label>
+        {{ form.email }}
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <label for="id_password1" style="display: block; margin-bottom: 0.5rem; color: #ccc;">Password</label>
+        {{ form.password1 }}
+      </div>
+
+      <div style="margin-bottom: 1.8rem;">
+        <label for="id_password2" style="display: block; margin-bottom: 0.5rem; color: #ccc;">Confirm Password</label>
+        {{ form.password2 }}
+      </div>
+
+      <button type="submit" style="width: 100%; padding: 0.9rem; background: #d32f2f; color: white; border: none; border-radius: 6px; font-size: 1.05rem; cursor: pointer;">
+        Register
+      </button>
+    </form>
+
+    <p style="text-align: center; margin-top: 1.5rem; color: #aaa;">
+      Already have an account? <a href="{% url 'accounts:login' %}" style="color: #ff9999;">Login</a>
+    </p>
+  </div>
+{% endblock %}

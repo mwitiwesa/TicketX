@@ -1,14 +1,16 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from datetime import date
+from apps.events.models import Event  # ← ADD THIS IMPORT (critical!)
 from .utils import get_calendar_data
+
 
 def calendar_view(request):
     year = int(request.GET.get('year', date.today().year))
     month = int(request.GET.get('month', date.today().month))
 
-    data = get_calendar_data(year, month)
-    return render(request, 'calendar_view/calendar.html', data)
+    data = get_calendar_data(year=year, month=month)
+    return render(request, 'core/home.html', data)  # or a dedicated template if you want
 
 
 def events_by_date(request):

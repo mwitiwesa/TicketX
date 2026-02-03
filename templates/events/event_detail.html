@@ -32,7 +32,9 @@
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.2rem;">
         {% for ticket in tickets %}
           <div style="background: #f8f8f8; border: 1px solid #ddd; border-radius: 10px; padding: 1rem; text-align: center;">
-            <h4 style="margin: 0 0 0.6rem; font-size: 1.15rem;">{{ ticket.name }}</h4>
+            <h4 style="margin: 0 0 0.6rem; font-size: 1.15rem; color: #d32f2f; font-weight: bold;">
+          {{ ticket.name }}
+            </h4>
             <p style="font-size: 1.3rem; font-weight: bold; color: #d32f2f;">
               KES {{ ticket.price|floatformat:2 }}
             </p>
