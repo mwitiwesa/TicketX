@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Book: {{ ticket.name }} for {{ event.title }}</h1>
+  <p><strong>Price per ticket:</strong> KES {{ ticket.price }}</p>
+  <p><strong>Remaining:</strong> {{ ticket.tickets_remaining }}</p>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Confirm Booking</button>
+  </form>
+
+  <p><small>Note: Booking is pending until payment is completed.</small></p>
+{% endblock %}

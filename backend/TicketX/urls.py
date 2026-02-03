@@ -11,7 +11,8 @@ urlpatterns = [
     path('events/', include('apps.events.urls')),
     path('bookings/', include('apps.bookings.urls')),
     #path('payments/', include('apps.payments.urls')),
-    #path('', include('apps.core.urls')),           # Homepage + search etc.
+    path('calendar/', include('apps.calendar_view.urls')),
+    path('', include('apps.core.urls')),
 ]
 
 # Serve media files during development

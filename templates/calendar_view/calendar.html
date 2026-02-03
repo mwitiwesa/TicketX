@@ -1,0 +1,69 @@
+{% load static %}
+
+<div id="calendar-container">
+  <h2>{{ month_name }} {{ year }}</h2>
+  
+  <div class="calendar-nav">
+    <a href="?year={{ prev_year }}&month={{ prev_month }}">« Prev</a>
+    <span>{{ month_name }} {{ year }}</span>
+    <a href="?year={{ next_year }}&month={{ next_month }}">Next »</a>
+  </div>
+
+  <div class="calendar-grid">
+  <!-- Weekday headers -->
+  <div class="weekday">Mon</div><div class="weekday">Tue</div><div class="weekday">Wed</div>
+  <div class="weekday">Thu</div><div class="weekday">Fri</div><div class="weekday">Sat</div>
+  <div class="weekday">Sun</div>
+
+  {% for day in calendar_days %}
+    {% if day %}
+      <div class="day {% if day.has_event %}has-event{% endif %} {% if day.is_today %}today{% endif %}"
+           data-year="{{ year }}" data-month="{{ month }}" data-day="{{ day.day }}">
+        {{ day.day }}
+      </div>
+    {% else %}
+      <div class="day empty"></div>
+    {% endif %}
+  {% endfor %}
+</div>
+
+  <div id="day-events">
+    <!-- Events for clicked day will load here via JS -->
+  </div>
+</div>
+
+<style>
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    text-align: center;
+  }
+  .weekday { font-weight: bold; padding: 10px; background: #eee; }
+  .day { padding: 15px; border: 1px solid #ddd; cursor: pointer; min-height: 60px; }
+  .day.empty { background: #f8f8f8; cursor: default; }
+  .has-event { background: #ffcccc; font-weight: bold; }
+  .today { border: 2px solid #007bff; }
+  .calendar-nav { text-align: center; margin: 1rem 0; }
+</style>
+
+<script>
+  document.querySelectorAll('.day[data-day]').forEach(day => {
+    day.addEventListener('click', function() {
+      const year = this.dataset.year;
+      const month = this.dataset.month;
+      const dayNum = this.dataset.day;
+
+      fetch(`{% url 'calendar_view:events_by_date' %}?year=${year}&month=${month}&day=${dayNum}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.html) {
+            document.getElementById('day-events').innerHTML = data.html;
+          } else if (data.error) {
+            alert(data.error);
+          }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+  });
+</script>

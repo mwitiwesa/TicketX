@@ -1,0 +1,13 @@
+{% if events %}
+  <h3>Events on {{ date }}</h3>
+  <ul>
+    {% for event in events %}
+      <li>
+        <a href="{% url 'events:event_detail' event.pk %}">{{ event.title }}</a>
+        at {{ event.event_time }} | {{ event.location|default:"TBA" }}
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No events on this day.</p>
+{% endif %}

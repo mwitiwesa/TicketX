@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ event.title }} - ticketX{% endblock %}
+
+{% block content %}
+  <div style="max-width: 700px; margin: 0 auto; padding: 1rem;">
+    <h1 style="font-size: 1.8rem; margin-bottom: 0.5rem;">{{ event.title }}</h1>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 1.5rem;">
+      <!-- Image – takes priority, bigger but not full page -->
+      {% if event.image %}
+        <div style="flex: 1 1 300px;">
+          <img src="{{ event.image.url }}" alt="{{ event.title }}"
+               style="width: 100%; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+        </div>
+      {% endif %}
+
+      <!-- Info block – compact -->
+      <div style="flex: 1 1 300px;">
+        <p><strong>Date:</strong> {{ event.event_date|date:"F j, Y" }} at {{ event.event_time }}</p>
+        <p><strong>Location:</strong> {{ event.location|default:"TBA" }}</p>
+        <p style="margin-top: 1rem; line-height: 1.5;">
+          {{ event.description|linebreaks|truncatewords:60 }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Tickets section – small cards with checkout button -->
+    <h2 style="font-size: 1.4rem; margin: 2rem 0 1rem;">Available Tickets</h2>
+
+    {% if tickets %}
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.2rem;">
+        {% for ticket in tickets %}
+          <div style="background: #f8f8f8; border: 1px solid #ddd; border-radius: 10px; padding: 1rem; text-align: center;">
+            <h4 style="margin: 0 0 0.6rem; font-size: 1.15rem;">{{ ticket.name }}</h4>
+            <p style="font-size: 1.3rem; font-weight: bold; color: #d32f2f;">
+              KES {{ ticket.price|floatformat:2 }}
+            </p>
+            <p style="color: #555; margin: 0.4rem 0;">
+              {{ ticket.tickets_remaining }} remaining
+            </p>
+
+            <!-- Checkout button -->
+            {% if ticket.tickets_remaining > 0 and user.is_authenticated %}
+              <a href="{% url 'bookings:booking_create' ticket.id %}"
+                 style="display: inline-block; background: #d32f2f; color: white; padding: 0.6rem 1.5rem; border-radius: 6px; text-decoration: none; font-weight: bold; margin-top: 0.8rem;">
+                Checkout
+              </a>
+            {% elif not user.is_authenticated %}
+              <p style="color: #777; font-size: 0.9rem; margin-top: 0.8rem;">
+                <a href="{% url 'accounts:login' %}">Login</a> to book
+              </p>
+            {% else %}
+              <p style="color: #777; font-size: 0.9rem; margin-top: 0.8rem;">
+                Sold out
+              </p>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p style="color: #777;">No tickets available yet.</p>
+    {% endif %}
+
+    <p style="margin-top: 2rem; text-align: center; color: #777;">
+      Created by {{ event.created_by.email }} on {{ event.created_at|date:"F j, Y" }}
+    </p>
+  </div>
+{% endblock %}

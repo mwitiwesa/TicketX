@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Results - ticketX{% endblock %}
+
+{% block content %}
+  <h1>Search Results for "{{ query }}"</h1>
+
+  {% if results %}
+    <ul style="list-style: none; padding: 0;">
+      {% for event in results %}
+        <li style="margin-bottom: 1.5rem; border-bottom: 1px solid #eee; padding-bottom: 1rem;">
+          <h3><a href="{% url 'events:event_detail' event.pk %}">{{ event.title }}</a></h3>
+          <p>{{ event.event_date }} | {{ event.location|default:"TBA" }}</p>
+          <p>{{ event.description|truncatewords:50 }}</p>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No events found matching "{{ query }}". Try different keywords.</p>
+  {% endif %}
+{% endblock %}
