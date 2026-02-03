@@ -8,8 +8,8 @@ urlpatterns = [
 
     # App URL includes — we'll create these url files next steps
     path('accounts/', include('apps.accounts.urls')),
-    #path('events/', include('apps.events.urls')),
-    #path('bookings/', include('apps.bookings.urls')),
+    path('events/', include('apps.events.urls')),
+    path('bookings/', include('apps.bookings.urls')),
     #path('payments/', include('apps.payments.urls')),
     #path('', include('apps.core.urls')),           # Homepage + search etc.
 ]
