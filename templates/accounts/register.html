@@ -6,9 +6,17 @@
   <div style="max-width: 420px; margin: 4rem auto; padding: 2rem; background: rgba(30, 30, 40, 0.9); border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); color: #eee;">
     <h2 style="text-align: center; margin-bottom: 1.8rem; color: #ff5252;">Create an Account</h2>
 
+    <!-- General form errors (non-field) -->
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger mb-3" style="padding: 0.8rem; border-radius: 6px; background: #c62828; color: white; text-align: center;">
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+
+    <!-- Success/error messages -->
     {% if messages %}
       {% for message in messages %}
-        <div style="padding: 0.8rem; margin-bottom: 1rem; border-radius: 6px; background: {% if message.tags == 'success' %}#2e7d32{% else %}#c62828{% endif %}; color: white; text-align: center;">
+        <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %} mb-3" style="padding: 0.8rem; border-radius: 6px; text-align: center;">
           {{ message }}
         </div>
       {% endfor %}
@@ -17,28 +25,46 @@
     <form method="post">
       {% csrf_token %}
 
-      <div style="margin-bottom: 1.5rem;">
-        <label for="id_email" style="display: block; margin-bottom: 0.5rem; color: #ccc;">Email</label>
+      <!-- Email Field -->
+      <div class="mb-3">
+        <label for="{{ form.email.id_for_label }}" style="display: block; margin-bottom: 0.5rem; color: #ccc;">Email</label>
         {{ form.email }}
+        {% if form.email.errors %}
+          <div class="text-danger small mt-1">
+            {{ form.email.errors }}
+          </div>
+        {% endif %}
       </div>
 
-      <div style="margin-bottom: 1.5rem;">
-        <label for="id_password1" style="display: block; margin-bottom: 0.5rem; color: #ccc;">Password</label>
+      <!-- Password Field -->
+      <div class="mb-3">
+        <label for="{{ form.password1.id_for_label }}" style="display: block; margin-bottom: 0.5rem; color: #ccc;">Password</label>
         {{ form.password1 }}
+        {% if form.password1.errors %}
+          <div class="text-danger small mt-1">
+            {{ form.password1.errors }}
+          </div>
+        {% endif %}
       </div>
 
-      <div style="margin-bottom: 1.8rem;">
-        <label for="id_password2" style="display: block; margin-bottom: 0.5rem; color: #ccc;">Confirm Password</label>
+      <!-- Confirm Password Field -->
+      <div class="mb-3">
+        <label for="{{ form.password2.id_for_label }}" style="display: block; margin-bottom: 0.5rem; color: #ccc;">Confirm Password</label>
         {{ form.password2 }}
+        {% if form.password2.errors %}
+          <div class="text-danger small mt-1">
+            {{ form.password2.errors }}
+          </div>
+        {% endif %}
       </div>
 
-      <button type="submit" style="width: 100%; padding: 0.9rem; background: #d32f2f; color: white; border: none; border-radius: 6px; font-size: 1.05rem; cursor: pointer;">
+      <button type="submit" style="width: 100%; padding: 0.9rem; background: #d32f2f; color: white; border: none; border-radius: 6px; font-size: 1.05rem; cursor: pointer; transition: background 0.2s;">
         Register
       </button>
     </form>
 
     <p style="text-align: center; margin-top: 1.5rem; color: #aaa;">
-      Already have an account? <a href="{% url 'accounts:login' %}" style="color: #ff9999;">Login</a>
+      Already have an account? <a href="{% url 'login' %}" style="color: #ff9999;">Login</a>
     </p>
   </div>
 {% endblock %}

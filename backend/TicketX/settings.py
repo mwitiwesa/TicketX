@@ -25,7 +25,6 @@ INSTALLED_APPS = [
     'apps.accounts',
     'apps.events',
     'apps.bookings',
-    'apps.payments',
     'apps.calendar_view',
     'apps.core',
 ]
@@ -85,6 +84,7 @@ USE_TZ = True
 # Static files (CSS, JS, Images)
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Media (uploaded images — event posters etc.)
 MEDIA_URL = '/media/'

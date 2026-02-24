@@ -9,24 +9,26 @@
   </h1>
 {% endblock %}
 
-{% block userlinks %}
-  {% if user.is_active and user.is_staff %}
-    Welcome, {{ user.email }}. 
-    <a href="{% url 'admin:password_change' %}">Change password</a> /
-    <a href="{% url 'admin:logout' %}">Log out</a>
-    <!-- Back to Home button – now green, inline after user links -->
-    <a href="{% url 'core:home' %}" 
-       style="margin-left: 1.5rem; padding: 0.5rem 1rem; background: #4caf50; color: white; border: none; border-radius: 6px; text-decoration: none; font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.3); transition: background 0.2s;">
+{% block nav-global %}
+  <!-- Back to Home Button – fixed top-right, using direct link -->
+  <div style="position: fixed; top: 12px; right: 20px; z-index: 9999;">
+    <a href="/" 
+       style="padding: 0.6rem 1.3rem; background: #d32f2f; color: white; border: none; border-radius: 6px; text-decoration: none; font-weight: bold; box-shadow: 0 2px 10px rgba(0,0,0,0.4); transition: background 0.2s;">
       ← Back to Home
     </a>
-  {% endif %}
+  </div>
 {% endblock %}
-
-{% block nav-global %}{% endblock %}
 
 {% block extrastyle %}
   {{ block.super }}
   <link rel="stylesheet" type="text/css" href="{% static 'admin/css/custom_admin.css' %}">
+{% endblock %}
+
+{% block userlinks %}
+  {% if user.is_active and user.is_staff %}
+    <a href="{% url 'admin:password_change' %}">Change password</a> /
+    <a href="{% url 'admin:logout' %}">Log out</a>
+  {% endif %}
 {% endblock %}
 
 {% block sidebar %}

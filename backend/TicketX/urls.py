@@ -9,9 +9,10 @@ urlpatterns = [
     # App URL includes — we'll create these url files next steps
     path('accounts/', include('apps.accounts.urls')),
     path('events/', include('apps.events.urls')),
+    path('accounts/', include('django.contrib.auth.urls')),  # ← this line gives name='login'
     path('bookings/', include('apps.bookings.urls')),
     #path('payments/', include('apps.payments.urls')),
-    path('calendar/', include('apps.calendar_view.urls')),
+    path('calendar/', include('apps.calendar_view.urls')), 
     path('', include('apps.core.urls')),
 ]
 

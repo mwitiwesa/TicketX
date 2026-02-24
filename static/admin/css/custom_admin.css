@@ -1,86 +1,179 @@
-/* Dark/Red Admin Theme */
+/* TicketX Dark/Red Admin Theme - Fixed Sidebar Visibility */
+
+/* Global body & background */
 body {
   background: #0a0a0a;
   color: #e0e0e0;
   font-family: 'Segoe UI', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
-#content-main, #content-related {
-  background: #111;
-  border: 1px solid #333;
-  border-radius: 10px;
-  box-shadow: 0 0 25px rgba(211, 47, 47, 0.25);
-  padding: 1.5rem;
+/* Red header (top bar) */
+#header {
+  background: linear-gradient(135deg, #d32f2f, #b71c1c) !important;
+  border-bottom: 3px solid #880e0e !important;
+  box-shadow: 0 4px 15px rgba(211, 47, 47, 0.4) !important;
+  padding: 1rem 2rem !important;
 }
 
-.module h2, .module caption {
-  color: #ff5252;
-  background: #1a1a1a;
-  border-bottom: 2px solid #d32f2f;
-  padding: 0.8rem 1rem;
-  border-radius: 8px 8px 0 0;
+/* Header text & links */
+#header h1, #header a, #header a:link, #header a:visited {
+  color: white !important;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
 }
 
-a, a:link, a:visited {
-  color: #ff8a80;
+#header a:hover {
+  color: #ffcccc !important;
 }
 
-a:hover {
-  color: #ff5252;
+/* Main layout – ensure sidebar is visible on right */
+#content {
+  background: transparent !important;
+  padding: 1.5rem 2rem !important;
+  overflow: visible !important; /* Critical fix - prevents overflow hidden */
 }
 
-.button, .submit-row input, input[type="submit"], input[type="button"] {
-  background: linear-gradient(135deg, #d32f2f, #b71c1c);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 0.6rem 1.2rem;
-  box-shadow: 0 2px 8px rgba(211, 47, 47, 0.4);
-  transition: all 0.2s;
+/* Main content (left side) */
+#content-main {
+  width: 62% !important;
+  float: left !important;
+  background: #111 !important;
+  border: 1px solid #333 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 0 25px rgba(211, 47, 47, 0.25) !important;
+  padding: 1.8rem !important;
+  margin-bottom: 2rem !important;
 }
 
-.button:hover, .submit-row input:hover {
-  background: linear-gradient(135deg, #ff5252, #d32f2f);
-  box-shadow: 0 4px 15px rgba(211, 47, 47, 0.6);
-  transform: translateY(-1px);
+/* Recent actions sidebar – restored visibility, wider, right side */
+#content-related {
+  width: 35% !important;
+  float: right !important;
+  margin-left: 3% !important;
+  background: #111 !important;
+  border: 1px solid #333 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 0 25px rgba(211, 47, 47, 0.25) !important;
+  padding: 1.5rem !important;
+  display: block !important; 
+  visibility: visible !important;
+  overflow: visible !important;
+  clear: none !important;
 }
 
-/* Glow on focused elements */
-input:focus, select:focus, textarea:focus {
-  border-color: #ff5252;
-  box-shadow: 0 0 12px rgba(211, 47, 47, 0.5);
+/* Recent actions heading & modules */
+#content-related h3 {
+  color: #ff5252 !important;
+  border-bottom: 1px solid #d32f2f !important;
+  padding-bottom: 0.8rem !important;
+  margin-bottom: 1.2rem !important;
 }
 
-/* Table styling */
-table {
-  background: #1a1a1a;
-  border-collapse: separate;
-  border-spacing: 0;
-  border-radius: 10px;
+#content-related .module {
+  margin-bottom: 1.8rem !important;
+  padding: 1rem !important;
+  background: #1a1a1a !important;
+  border-radius: 8px !important;
+}
+
+/* Modules & sections – breathing room */
+.module, .changelist-form-container {
+  background: #1a1a1a !important;
+  border: 1px solid #444 !important;
+  border-radius: 10px !important;
+  margin-bottom: 2.5rem !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
   overflow: hidden;
 }
 
+.module h2, .module caption, .changelist-form-container h2 {
+  color: #ff5252 !important;
+  background: #222 !important;
+  border-bottom: 2px solid #d32f2f !important;
+  padding: 1rem !important;
+  margin: 0 !important;
+  border-radius: 10px 10px 0 0 !important;
+}
+
+/* Links & buttons */
+a, a:link, a:visited {
+  color: #ff8a80 !important;
+}
+
+a:hover {
+  color: #ff5252 !important;
+}
+
+.button, .submit-row input, input[type="submit"], input[type="button"], .submit-row a {
+  background: linear-gradient(135deg, #d32f2f, #b71c1c) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 0.8rem 1.5rem !important;
+  box-shadow: 0 3px 10px rgba(211, 47, 47, 0.4) !important;
+  transition: all 0.2s !important;
+}
+
+.button:hover, .submit-row input:hover {
+  background: linear-gradient(135deg, #ff5252, #d32f2f) !important;
+  box-shadow: 0 6px 20px rgba(211, 47, 47, 0.6) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Glow on focused inputs */
+input:focus, select:focus, textarea:focus {
+  border-color: #ff5252 !important;
+  box-shadow: 0 0 15px rgba(211, 47, 47, 0.5) !important;
+}
+
+/* Tables – organized */
+table {
+  background: #1a1a1a !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  border-radius: 10px !important;
+  overflow: hidden !important;
+  width: 100% !important;
+}
+
 th {
-  background: #222;
-  color: #ff8a80;
-  padding: 12px;
+  background: #222 !important;
+  color: #ff8a80 !important;
+  padding: 14px !important;
+  text-align: left !important;
 }
 
 td {
-  padding: 10px;
-  border-bottom: 1px solid #333;
+  padding: 12px !important;
+  border-bottom: 1px solid #333 !important;
 }
 
 tr:hover {
-  background: #222;
+  background: #222 !important;
 }
 
-/* Sidebar / Recent actions */
-#content-related {
-  background: #111;
-  border-radius: 10px;
+/* Responsive – stack sidebar on small screens */
+@media (max-width: 1024px) {
+  #content-main, #content-related {
+    width: 100% !important;
+    float: none !important;
+    margin: 0 0 2rem 0 !important;
+  }
+}
+/* Prevent admin date picker cutoff */
+.datepicker {
+  z-index: 9999 !important;
+  position: absolute !important;
+  top: auto !important;
+  left: auto !important;
 }
 
-#content-related h3 {
-  color: #ff5252;
+.admin-date-widget {
+  position: relative;
+}
+
+.field-event_date .related-widget-wrapper {
+  position: relative;
+  z-index: 1000;
 }

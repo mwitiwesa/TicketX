@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Checkout - TicketX{% endblock %}
+
+{% block content %}
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-6 col-md-8">
+
+        <!-- Django messages (success/error) -->
+        {% if messages %}
+          <div class="mb-4">
+            {% for message in messages %}
+              <div class="alert alert-{% if message.tags == 'success' %}success{% else %}danger{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <div class="card shadow-lg border-0" style="border-radius: 16px; background: #111; overflow: hidden;">
+          <!-- Card Header -->
+          <div class="card-header text-center py-4" style="background: linear-gradient(135deg, #d32f2f, #b71c1c); color: white;">
+            <h2 class="mb-0">Complete Payment</h2>
+          </div>
+
+          <div class="card-body p-4 p-md-5">
+            <!-- Booking Summary -->
+            <div class="text-center mb-5">
+              <h4 class="text-danger fw-bold mb-2">
+                Booking #{{ booking.id }} – {{ booking.ticket.name }} × {{ booking.quantity }}
+              </h4>
+              <p class="text-muted mb-1">Event: {{ booking.ticket.event.title }}</p>
+              <p class="h3 fw-bold text-danger mt-3">
+                KES {{ booking.total_price|floatformat:2 }}
+              </p>
+              <small class="text-muted">Total Amount</small>
+            </div>
+
+            <!-- Payment Form -->
+            <form method="post" action="{% url 'bookings:checkout' booking.id %}">
+              {% csrf_token %}
+
+              <div class="mb-4">
+                <label for="phone" class="form-label text-center d-block mb-3 fw-bold" style="color: #ddd; font-size: 1.1rem;">
+                  M-Pesa Phone Number
+                </label>
+                <input type="tel" name="phone" id="phone" required
+                       placeholder="2547xxxxxxxx" pattern="254[0-9]{9}"
+                       class="form-control form-control-lg text-center"
+                       style="background: #222; color: #eee; border: 1px solid #444; border-radius: 10px;">
+                <small class="form-text text-muted text-center d-block mt-2">
+                  Enter the number you want to pay with (must start with 254)
+                </small>
+              </div>
+
+              <button type="submit" class="btn btn-danger btn-lg w-100 py-3 fw-bold" style="font-size: 1.2rem; border-radius: 10px;">
+                Pay with M-Pesa
+              </button>
+            </form>
+
+            <!-- Info Note -->
+            <div class="text-center mt-4">
+              <small class="text-muted">
+                You will receive a prompt on your phone to enter your PIN.<br>
+                Booking is reserved until payment is completed.
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

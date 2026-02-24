@@ -8,7 +8,7 @@ from apps.calendar_view.utils import get_calendar_data
 def home(request):
     today = date.today()
 
-    # Get year and month from URL query params (for navigation), default to current month
+    # Get year and month from URL query params for calendar navigation
     try:
         year = int(request.GET.get('year', today.year))
         month = int(request.GET.get('month', today.month))
@@ -16,37 +16,24 @@ def home(request):
         year = today.year
         month = today.month
 
-    # Events Today – always use real today (not affected by calendar navigation)
+    # Events today – always real today
     events_today = Event.objects.filter(
         is_active=True,
         event_date=today
     ).order_by('event_time')
 
-    # Upcoming – future events from real today (30 days ahead)
-    upcoming = Event.objects.filter(
+    # Upcoming events – future events only (next 30 days, ordered by date)
+    upcoming_events = Event.objects.filter(
         is_active=True,
-        event_date__gt=today,
-        event_date__lte=today + timedelta(days=30)
-    ).order_by('event_date', 'event_time')
+        event_date__gt=today
+    ).order_by('event_date', 'event_time')[:12]  # show up to 12 for carousel
 
-    # Calendar data – use the year/month from URL params
+    # Calendar data (based on URL year/month)
     calendar_data = get_calendar_data(year=year, month=month)
-
-    # Debug prints – keep these to verify
-    print("DEBUG: URL params year/month:", year, month)
-    print("DEBUG: Calendar displaying:", calendar_data['month_name'], calendar_data['year'])
-    print("DEBUG: Events today count:", events_today.count())
-    print("DEBUG: Upcoming count:", upcoming.count())
-    print("DEBUG: Red days in displayed month:", 
-          {ev.event_date.day for ev in Event.objects.filter(
-              is_active=True,
-              event_date__month=calendar_data['month'],
-              event_date__year=calendar_data['year']
-          )})
 
     context = {
         'events_today': events_today,
-        'upcoming': upcoming,
+        'upcoming_events': upcoming_events,
         'today': today,
         'calendar_days': calendar_data['calendar_days'],
         'year': calendar_data['year'],
@@ -57,6 +44,7 @@ def home(request):
         'next_month': calendar_data['next_month'],
         'next_year': calendar_data['next_year'],
     }
+
     return render(request, 'core/home.html', context)
 
 
