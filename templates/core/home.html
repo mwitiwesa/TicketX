@@ -17,27 +17,32 @@
       Welcome to TicketX
     </h1>
 
-    <!-- Events Today -->
+    <!-- Events Today – Fixed slim rectangular cards -->
     <section class="mb-5">
       <h2 style="font-size: 1.8rem; text-align: center; margin-bottom: 1.8rem; color: #fff;">
         Events Today ({{ today|date:"F j, Y" }})
       </h2>
 
       {% if events_today %}
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem;">
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem; max-width: 1000px; margin: 0 auto;">
           {% for event in events_today %}
-            <div style="background: rgba(30, 30, 40, 0.9); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: transform 0.2s;">
-              {% if event.image %}
-                <img src="{{ event.image.url }}" alt="{{ event.title }}" 
-                     style="width: 100%; height: 220px; object-fit: cover;"
-                     onerror="this.src='{% static 'img/placeholder-event.jpg' %}'; this.onerror=null;">
-              {% else %}
-                <div style="width: 100%; height: 220px; background: #1e1e2e; display: flex; align-items: center; justify-content: center; color: #777;">
-                  No image
-                </div>
-              {% endif %}
+            <div style="width: 280px; background: rgba(30, 30, 40, 0.9); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: transform 0.2s;">
+              <!-- Fixed rectangular image container -->
+              <div style="width: 100%; height: 180px; overflow: hidden; background: #1e1e2e;">
+                {% if event.image %}
+                  <img src="{{ event.image.url }}" alt="{{ event.title }}" 
+                       style="width: 100%; height: 100%; object-fit: cover;"
+                       onerror="this.src='{% static 'img/placeholder-event.jpg' %}'; this.onerror=null;">
+                {% else %}
+                  <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #777;">
+                    <i class="fas fa-calendar-alt fa-3x"></i>
+                  </div>
+                {% endif %}
+              </div>
+
+              <!-- Content -->
               <div style="padding: 1rem;">
-                <h3 style="font-size: 1.15rem; margin: 0 0 0.6rem;">
+                <h3 style="font-size: 1.15rem; margin: 0 0 0.6rem; line-height: 1.3;">
                   <a href="{% url 'events:event_detail' event.pk %}" style="color: #ff5252; text-decoration: none;">
                     {{ event.title }}
                   </a>
@@ -45,7 +50,7 @@
                 <p style="font-size: 0.9rem; color: #bbb; margin: 0 0 0.5rem;">
                   {{ event.event_time }} • {{ event.location|default:"TBA" }}
                 </p>
-                <p style="font-size: 0.85rem; color: #aaa; line-height: 1.4;">
+                <p style="font-size: 0.85rem; color: #aaa; line-height: 1.4; margin: 0;">
                   {{ event.description|truncatewords:25 }}
                 </p>
               </div>
@@ -60,104 +65,73 @@
     </section>
 
     <!-- Upcoming Events – Full-Photo Card Carousel -->
-<section class="upcoming-events mb-5">
-  <h2 class="text-center mb-4" style="color: #ff5252;">Upcoming Events</h2>
+    <section class="upcoming-events mb-5">
+      <h2 class="text-center mb-4" style="color: #ff5252;">Upcoming Events</h2>
 
-  {% if upcoming_events %}
-    <div class="events-scroller position-relative overflow-hidden" style="width: 100%;">
-      <div class="events-track d-flex">
-        {% for event in upcoming_events %}
-          <div class="event-card flex-shrink-0 mx-3" style="width: 320px; min-height: 380px;">
-            <div class="card bg-dark text-white border-0 shadow-lg h-100 position-relative overflow-hidden" style="border-radius: 16px;">
-              <!-- Full-card background image -->
-              <div style="position: absolute; inset: 0; background: {% if event.image %}url('{{ event.image.url }}'){% else %}#222{% endif %} center center / cover no-repeat;"></div>
+      {% if upcoming_events %}
+        <div class="events-scroller position-relative overflow-hidden" style="width: 100%;">
+          <div class="events-track d-flex">
+            {% for event in upcoming_events %}
+              <div class="event-card flex-shrink-0 mx-3" style="width: 320px; min-height: 380px;">
+                <div class="card bg-dark text-white border-0 shadow-lg h-100 position-relative overflow-hidden" style="border-radius: 16px;">
+                  <!-- Full-card background image -->
+                  <div style="position: absolute; inset: 0; background: {% if event.image %}url('{{ event.image.url }}'){% else %}#222{% endif %} center center / cover no-repeat;"></div>
 
-              <!-- Semi-transparent overlay for text readability -->
-              <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.85) 30%, rgba(0,0,0,0.4) 70%); z-index: 1;"></div>
+                  <!-- Semi-transparent overlay for text readability -->
+                  <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.85) 30%, rgba(0,0,0,0.4) 70%); z-index: 1;"></div>
 
-              <!-- Content on top -->
-              <div class="card-body d-flex flex-column position-relative" style="z-index: 2; padding: 1.5rem;">
-                <div class="mt-auto">
-                  <h5 class="card-title fw-bold mb-2" style="font-size: 1.3rem; text-shadow: 0 1px 4px rgba(0,0,0,0.8);">
-                    {{ event.title }}
-                  </h5>
-                  <p class="card-text mb-2" style="font-size: 0.95rem; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">
-                    <i class="far fa-calendar-alt me-2"></i> {{ event.event_date|date:"D, d M Y" }} at {{ event.event_time }}
-                  </p>
-                  <p class="card-text mb-3" style="font-size: 0.95rem; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">
-                    <i class="fas fa-map-marker-alt me-2"></i> {{ event.location|default:"TBA" }}
-                  </p>
-                  <a href="{% url 'events:event_detail' event.pk %}" class="btn btn-danger w-100 py-2 fw-bold" style="border-radius: 8px;">
-                    View Details
-                  </a>
+                  <!-- Content on top -->
+                  <div class="card-body d-flex flex-column position-relative" style="z-index: 2; padding: 1.5rem;">
+                    <div class="mt-auto">
+                      <h5 class="card-title fw-bold mb-2" style="font-size: 1.3rem; text-shadow: 0 1px 4px rgba(0,0,0,0.8);">
+                        {{ event.title }}
+                      </h5>
+                      <p class="card-text mb-2" style="font-size: 0.95rem; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">
+                        <i class="far fa-calendar-alt me-2"></i> {{ event.event_date|date:"D, d M Y" }} at {{ event.event_time }}
+                      </p>
+                      <p class="card-text mb-3" style="font-size: 0.95rem; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">
+                        <i class="fas fa-map-marker-alt me-2"></i> {{ event.location|default:"TBA" }}
+                      </p>
+                      <a href="{% url 'events:event_detail' event.pk %}" class="btn btn-danger w-100 py-2 fw-bold" style="border-radius: 8px;">
+                        View Details
+                      </a>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        {% endfor %}
+            {% endfor %}
 
-        <!-- Duplicate cards for infinite seamless scroll -->
-        {% for event in upcoming_events %}
-          <div class="event-card flex-shrink-0 mx-3" style="width: 320px; min-height: 380px;">
-            <div class="card bg-dark text-white border-0 shadow-lg h-100 position-relative overflow-hidden" style="border-radius: 16px;">
-              <div style="position: absolute; inset: 0; background: {% if event.image %}url('{{ event.image.url }}'){% else %}#222{% endif %} center center / cover no-repeat;"></div>
-              <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.85) 30%, rgba(0,0,0,0.4) 70%); z-index: 1;"></div>
-              <div class="card-body d-flex flex-column position-relative" style="z-index: 2; padding: 1.5rem;">
-                <div class="mt-auto">
-                  <h5 class="card-title fw-bold mb-2" style="font-size: 1.3rem; text-shadow: 0 1px 4px rgba(0,0,0,0.8);">
-                    {{ event.title }}
-                  </h5>
-                  <p class="card-text mb-2" style="font-size: 0.95rem; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">
-                    <i class="far fa-calendar-alt me-2"></i> {{ event.event_date|date:"D, d M Y" }} at {{ event.event_time }}
-                  </p>
-                  <p class="card-text mb-3" style="font-size: 0.95rem; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">
-                    <i class="fas fa-map-marker-alt me-2"></i> {{ event.location|default:"TBA" }}
-                  </p>
-                  <a href="{% url 'events:event_detail' event.pk %}" class="btn btn-danger w-100 py-2 fw-bold" style="border-radius: 8px;">
-                    View Details
-                  </a>
+            <!-- Duplicate cards for infinite seamless scroll -->
+            {% for event in upcoming_events %}
+              <div class="event-card flex-shrink-0 mx-3" style="width: 320px; min-height: 380px;">
+                <div class="card bg-dark text-white border-0 shadow-lg h-100 position-relative overflow-hidden" style="border-radius: 16px;">
+                  <div style="position: absolute; inset: 0; background: {% if event.image %}url('{{ event.image.url }}'){% else %}#222{% endif %} center center / cover no-repeat;"></div>
+                  <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.85) 30%, rgba(0,0,0,0.4) 70%); z-index: 1;"></div>
+                  <div class="card-body d-flex flex-column position-relative" style="z-index: 2; padding: 1.5rem;">
+                    <div class="mt-auto">
+                      <h5 class="card-title fw-bold mb-2" style="font-size: 1.3rem; text-shadow: 0 1px 4px rgba(0,0,0,0.8);">
+                        {{ event.title }}
+                      </h5>
+                      <p class="card-text mb-2" style="font-size: 0.95rem; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">
+                        <i class="far fa-calendar-alt me-2"></i> {{ event.event_date|date:"D, d M Y" }} at {{ event.event_time }}
+                      </p>
+                      <p class="card-text mb-3" style="font-size: 0.95rem; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">
+                        <i class="fas fa-map-marker-alt me-2"></i> {{ event.location|default:"TBA" }}
+                      </p>
+                      <a href="{% url 'events:event_detail' event.pk %}" class="btn btn-danger w-100 py-2 fw-bold" style="border-radius: 8px;">
+                        View Details
+                      </a>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            {% endfor %}
           </div>
-        {% endfor %}
-      </div>
-    </div>
-  {% else %}
-    <p class="text-center text-muted">No upcoming events yet. Check back soon!</p>
-  {% endif %}
-</section>
-
-<!-- Carousel Styles – adjust speed here -->
-<style>
-  .events-scroller {
-    width: 100%;
-    overflow: hidden;
-  }
-  .events-track {
-    display: flex;
-    animation: scrollLeft 25s linear infinite;  /* ← Change this number to adjust speed:
-                                                   - 15s = very fast
-                                                   - 20s = fast
-                                                   - 25s = medium-fast (recommended)
-                                                   - 35s = moderate
-                                                   - 45s+ = slow */
-    will-change: transform;
-  }
-  .events-track:hover {
-    animation-play-state: paused;
-  }
-  @keyframes scrollLeft {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-  }
-  .event-card {
-    transition: transform 0.3s ease;
-  }
-  .event-card:hover {
-    transform: scale(1.05);
-  }
-</style>
+        </div>
+      {% else %}
+        <p class="text-center text-muted">No upcoming events yet. Check back soon!</p>
+      {% endif %}
+    </section>
 
     <!-- Carousel Styles – adjust speed here -->
     <style>

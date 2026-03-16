@@ -3,82 +3,106 @@
 {% block title %}Book Tickets - TicketX{% endblock %}
 
 {% block content %}
-  <div style="max-width: 500px; margin: 4rem auto; padding: 0 1rem;">
-    <!-- Glowing red box container -->
-    <div style="background: #111; border-radius: 16px; padding: 2.5rem 2rem; box-shadow: 0 0 30px rgba(211, 47, 47, 0.4), inset 0 0 15px rgba(211, 47, 47, 0.15); border: 1px solid #d32f2f33;">
+  <div style="max-width: 520px; margin: 4rem auto; padding: 0 1rem;">
+    <!-- Glowing red/dark card -->
+    <div style="background: #111; border-radius: 16px; padding: 2.5rem 2rem; box-shadow: 0 0 30px rgba(211, 47, 47, 0.4); border: 1px solid #d32f2f33;">
       
       <!-- Header -->
       <h1 style="text-align: center; color: #ff5252; margin-bottom: 0.5rem; font-size: 1.8rem;">
         Book {{ ticket.name }} Tickets
       </h1>
       <p style="text-align: center; color: #bbb; margin-bottom: 2rem; font-size: 1.05rem;">
-        {{ event.title }} • {{ event.event_date|date:"F j, Y" }} at {{ event.event_time }}
+        {{ ticket.event.title }} • {{ ticket.event.event_date|date:"F j, Y" }} at {{ ticket.event.event_time }}
       </p>
 
-      <!-- Price & Availability Info -->
-      <div style="text-align: center; margin-bottom: 2rem;">
-        <div style="font-size: 2.2rem; font-weight: bold; color: #ff5252; margin-bottom: 0.3rem;">
+      <!-- Price & Availability -->
+      <div style="text-align: center; margin-bottom: 2.5rem;">
+        <div style="font-size: 2.4rem; font-weight: bold; color: #ff5252;">
           KES {{ ticket.price|floatformat:2 }}
         </div>
-        <div style="font-size: 1rem; color: #aaa;">
+        <div style="font-size: 1.1rem; color: #aaa; margin-top: 0.3rem;">
           per ticket • <strong style="color: #ff9800;">{{ ticket.tickets_remaining }}</strong> remaining
         </div>
       </div>
 
-      <!-- Quantity Selector -->
-      <form method="post" style="margin-bottom: 2rem;">
+      <!-- Form & Quantity Selector -->
+      <form method="post" id="booking-form">
         {% csrf_token %}
-        <label for="quantity" style="display: block; text-align: center; color: #ddd; margin-bottom: 0.8rem; font-size: 1.1rem;">
+
+        <label for="id_quantity" style="display: block; text-align: center; color: #ddd; margin-bottom: 0.8rem; font-size: 1.1rem;">
           How many tickets?
         </label>
 
-        <div style="display: flex; justify-content: center; align-items: center; gap: 1rem; margin-bottom: 2rem;">
-          <button type="button" onclick="decrement()" style="width: 50px; height: 50px; font-size: 1.5rem; background: #222; color: white; border: 1px solid #444; border-radius: 50%; cursor: pointer;">-</button>
-          {{ form.quantity }}
-          <button type="button" onclick="increment()" style="width: 50px; height: 50px; font-size: 1.5rem; background: #222; color: white; border: 1px solid #444; border-radius: 50%; cursor: pointer;">+</button>
+        <div style="display: flex; justify-content: center; align-items: center; gap: 1.2rem; margin-bottom: 2rem;">
+          <button type="button" onclick="decrement()" 
+                  style="width: 50px; height: 50px; font-size: 1.6rem; background: #222; color: white; border: 1px solid #444; border-radius: 50%; cursor: pointer; transition: background 0.2s;">
+            -
+          </button>
+
+          <input type="number" name="quantity" id="id_quantity" value="1" min="1" max="{{ ticket.tickets_remaining }}" required
+                 style="width: 100px; padding: 0.8rem; font-size: 1.8rem; text-align: center; background: #222; color: white; border: 1px solid #444; border-radius: 8px;">
+
+          <button type="button" onclick="increment()" 
+                  style="width: 50px; height: 50px; font-size: 1.6rem; background: #222; color: white; border: 1px solid #444; border-radius: 50%; cursor: pointer; transition: background 0.2s;">
+            +
+          </button>
         </div>
 
-        <!-- Total Price Preview -->
-        <div style="text-align: center; font-size: 1.3rem; color: #ff9800; margin-bottom: 2rem;">
+        <!-- Total Preview -->
+        <div style="text-align: center; font-size: 1.4rem; color: #ff9800; margin-bottom: 2rem;">
           Total: KES <span id="total-price">{{ ticket.price|floatformat:2 }}</span>
         </div>
 
-        <!-- Confirm Booking Button -->
-        <button type="submit" style="width: 100%; padding: 1rem; background: linear-gradient(135deg, #d32f2f, #b71c1c); color: white; border: none; border-radius: 8px; font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: transform 0.2s;">
+        <!-- Errors -->
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-info{% endif %} mb-3" style="text-align: center;">
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        <!-- Submit Button -->
+        <button type="submit" 
+                style="width: 100%; padding: 1.1rem; background: linear-gradient(135deg, #d32f2f, #b71c1c); color: white; border: none; border-radius: 8px; font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: transform 0.2s;">
           Confirm Booking & Proceed to Payment
         </button>
       </form>
 
       <!-- Note -->
-      <p style="text-align: center; color: #888; font-size: 0.9rem; margin-top: 1.5rem;">
-        Booking is reserved but pending until payment is completed.
+      <p style="text-align: center; color: #888; font-size: 0.95rem; margin-top: 1.8rem;">
+        Booking is reserved for 15 minutes. Complete payment to secure your spot.
       </p>
     </div>
   </div>
 
-  <!-- Quantity selector JavaScript -->
+  <!-- Quantity & Total JS -->
   <script>
+    const price = {{ ticket.price }};
+    const maxTickets = {{ ticket.tickets_remaining }};
     const quantityInput = document.getElementById('id_quantity');
-    const totalPriceSpan = document.getElementById('total-price');
-    const ticketPrice = {{ ticket.price }};
+    const totalDisplay = document.getElementById('total-price');
 
     function updateTotal() {
-      const qty = parseInt(quantityInput.value) || 0;
-      totalPriceSpan.textContent = (qty * ticketPrice).toFixed(2);
+      let qty = parseInt(quantityInput.value) || 1;
+      if (qty < 1) qty = 1;
+      if (qty > maxTickets) qty = maxTickets;
+      quantityInput.value = qty;
+      totalDisplay.textContent = (qty * price).toFixed(2);
     }
 
     function increment() {
-      let val = parseInt(quantityInput.value) || 0;
-      if (val < {{ ticket.tickets_remaining }}) {
-        quantityInput.value = val + 1;
+      let qty = parseInt(quantityInput.value) || 1;
+      if (qty < maxTickets) {
+        quantityInput.value = qty + 1;
         updateTotal();
       }
     }
 
     function decrement() {
-      let val = parseInt(quantityInput.value) || 0;
-      if (val > 1) {
-        quantityInput.value = val - 1;
+      let qty = parseInt(quantityInput.value) || 1;
+      if (qty > 1) {
+        quantityInput.value = qty - 1;
         updateTotal();
       }
     }

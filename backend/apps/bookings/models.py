@@ -13,6 +13,10 @@ class Booking(models.Model):
         ('CANCELLED', 'Cancelled'),
         ('EXPIRED', 'Expired'),
     )
+    is_used = models.BooleanField(default=False)         
+    validated_at = models.DateTimeField(null=True, blank=True)
+    scan_note = models.TextField(blank=True, null=True)
+
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -21,7 +25,7 @@ class Booking(models.Model):
     )
     ticket = models.ForeignKey(
         Ticket,
-        on_delete=models.PROTECT,  # Prevent ticket deletion if booked
+        on_delete=models.PROTECT,
         related_name='bookings'
     )
     quantity = models.PositiveIntegerField(default=1)
@@ -33,8 +37,15 @@ class Booking(models.Model):
     )
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
-    expires_at = models.DateTimeField(null=True, blank=True)  # Optional: for time-limited reservations
-    checkout_request_id = models.CharField(max_length=100, blank=True, null=True)  # For M-Pesa tracking
+    expires_at = models.DateTimeField(null=True, blank=True)  # Optional: reservation expiry
+
+    # Payment fields
+    is_paid = models.BooleanField(default=False)
+    paid_at = models.DateTimeField(null=True, blank=True)
+    payment_reference = models.CharField(max_length=100, blank=True, null=True)  # e.g. Buni txn ID
+
+    # Attendee names for multi-ticket bookings
+    attendee_names = models.JSONField(default=list, blank=True)  # ["John Doe", "Jane Smith", ...]
 
     class Meta:
         ordering = ['-created_at']
@@ -45,17 +56,18 @@ class Booking(models.Model):
         return f"{self.user.email} - {self.quantity}x {self.ticket} ({self.status})"
 
     def clean(self):
-        # Only basic validation here — no ticket access
         if self.quantity <= 0:
             raise ValidationError("Quantity must be at least 1.")
 
     def save(self, *args, **kwargs):
         if self.pk is None:  # New booking
             self.total_price = self.ticket.price * self.quantity
-            # Optional: set expires_at = now + 15 minutes
-            # self.expires_at = timezone.now() + timezone.timedelta(minutes=15)
         super().save(*args, **kwargs)
 
     @property
     def is_confirmed(self):
-        return self.status == 'PAID'
+        return self.status == 'PAID' and self.is_paid
+
+    @property
+    def attendee_count(self):
+        return len(self.attendee_names) if self.attendee_names else self.quantity

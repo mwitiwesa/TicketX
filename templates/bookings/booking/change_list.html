@@ -1,0 +1,10 @@
+{% extends "admin/change_list.html" %}
+
+{% block object-tools-items %}
+  {{ block.super }}
+  <li>
+    <a href="{{ qr_scanner_url }}" class="button" target="_blank" style="background:#4caf50; color:white;">
+      Open QR Ticket Scanner
+    </a>
+  </li>
+{% endblock %}

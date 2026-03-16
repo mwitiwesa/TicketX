@@ -85,13 +85,66 @@
             margin-top: 3rem; 
             border-top: 1px solid #333;
         }
+
+        /* Side Menu Styles */
+        #menu-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: #d32f2f;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.8rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            display: none; /* hidden by default - show only if logged in */
+        }
+        #side-menu {
+            position: fixed;
+            top: 0;
+            right: -350px;
+            width: 350px;
+            height: 100%;
+            background: rgba(20, 20, 30, 0.98);
+            color: white;
+            box-shadow: -5px 0 30px rgba(0,0,0,0.6);
+            transition: right 0.4s ease;
+            z-index: 999;
+            overflow-y: auto;
+            padding: 80px 20px 20px;
+        }
+        #menu-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            border: none;
+            color: #ff5252;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+        .ticket-card {
+            background: rgba(30, 30, 40, 0.9);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #444;
+            transition: transform 0.2s;
+        }
+        .ticket-card:hover {
+            transform: translateY(-5px);
+        }
     </style>
 </head>
 <body>
 
 <nav>
     <div class="logo">
-        <a href="{% url 'core:home' %}">TicketX</a>   <!-- Changed to TicketX -->
+        <a href="{% url 'core:home' %}">TicketX</a>
     </div>
 
     <div class="search-bar">
@@ -104,12 +157,10 @@
         {% if user.is_authenticated %}
             <span>👤 {{ user.email }}</span>
 
-            <!-- Admin/Staff button – visible only to staff or superuser -->
             {% if user.is_staff or user.is_superuser %}
                 <a href="{% url 'admin:index' %}" class="admin-btn">Go to Admin Panel</a>
             {% endif %}
 
-            <!-- Logout form – redirects to login page -->
             <form action="{% url 'accounts:logout' %}" method="post" style="display: inline;">
                 {% csrf_token %}
                 <input type="hidden" name="next" value="{% url 'accounts:login' %}">
@@ -133,11 +184,124 @@
     {% endif %}
 
     {% block content %}{% endblock %}
+
+    <!-- Side Menu (Hamburger) - only for logged-in users -->
+    {% if user.is_authenticated %}
+      <button id="menu-toggle" style="display: block;">
+        ☰
+      </button>
+
+      <div id="side-menu">
+        <button id="menu-close">×</button>
+
+        <h3 style="text-align: center; color: #ff5252; margin-bottom: 2rem;">Your Account</h3>
+
+        <!-- Your Tickets Section -->
+        <div style="margin-bottom: 2rem;">
+          <h4 style="color: #ff9800; margin-bottom: 1rem;">Your Tickets</h4>
+
+          {% if user_bookings %}
+            {% for booking in user_bookings %}
+              <div class="ticket-card">
+                <!-- Event Poster Thumbnail -->
+                {% if booking.ticket.event.image %}
+                  <img src="{{ booking.ticket.event.image.url }}" alt="{{ booking.ticket.event.title }}" 
+                       style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 0.8rem;">
+                {% else %}
+                  <div style="width: 100%; height: 120px; background: #222; border-radius: 8px; margin-bottom: 0.8rem; display: flex; align-items: center; justify-content: center; color: #777;">
+                    No Poster
+                  </div>
+                {% endif %}
+
+                <p style="margin: 0 0 0.5rem; font-size: 1.1rem; color: #ff9800;">
+                  {{ booking.ticket.event.title }}
+                </p>
+                <p style="margin: 0 0 0.5rem; color: #ddd;">
+                  <strong>Type:</strong> {{ booking.ticket.name }}<br>
+                  <strong>Qty:</strong> {{ booking.quantity }}<br>
+                  <strong>Total:</strong> KES {{ booking.total_price|floatformat:2 }}
+                </p>
+                <p style="margin: 0 0 1rem;">
+                  <strong>Status:</strong> 
+                  <span style="color: {% if booking.is_paid %}#4caf50{% else %}#ff9800{% endif %};">
+                    {% if booking.is_paid %}PAID{% else %}Pending{% endif %}
+                  </span>
+                </p>
+
+                <div style="display: flex; gap: 0.5rem;">
+                  {% if booking.is_paid %}
+                    <a href="{% url 'bookings:download_tickets' booking.id %}" class="btn btn-success btn-sm flex-fill">
+                      Download
+                    </a>
+                  {% else %}
+                    <a href="{% url 'bookings:checkout' booking.id %}" class="btn btn-warning btn-sm flex-fill">
+                      Pay Now
+                    </a>
+                  {% endif %}
+                </div>
+              </div>
+            {% endfor %}
+
+            <!-- Pagination -->
+            {% if user_bookings.has_other_pages %}
+              <div style="text-align: center; margin-top: 1rem; color: #aaa;">
+                {% if user_bookings.has_previous %}
+                  <a href="?page={{ user_bookings.previous_page_number }}" style="color: #ff5252; margin: 0 1rem;">← Prev</a>
+                {% endif %}
+                Page {{ user_bookings.number }} of {{ user_bookings.paginator.num_pages }}
+                {% if user_bookings.has_next %}
+                  <a href="?page={{ user_bookings.next_page_number }}" style="color: #ff5252; margin: 0 1rem;">Next →</a>
+                {% endif %}
+              </div>
+            {% endif %}
+
+          {% else %}
+            <div style="text-align: center; color: #aaa; padding: 2rem;">
+              <p style="font-size: 1.2rem;">No tickets yet</p>
+              <p>Browse events and book your next adventure!</p>
+              <a href="{% url 'events:event_list' %}" style="color: #ff5252; font-weight: bold;">Find Events →</a>
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Logout -->
+        <div style="text-align: center; margin-top: 2rem;">
+          <a href="{% url 'logout' %}" style="color: #ff5252; font-size: 1.1rem; text-decoration: none;">
+            Logout
+          </a>
+        </div>
+      </div>
+    {% endif %}
+
 </div>
 
 <footer>
     <p>© 2026 TicketX - Event Ticketing Platform | Developed by Wesa Mwiti </p>
 </footer>
 
+<!-- Bootstrap JS (for better button styling) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  const menuToggle = document.getElementById('menu-toggle');
+  const menuClose = document.getElementById('menu-close');
+  const sideMenu = document.getElementById('side-menu');
+
+  if (menuToggle && sideMenu) {
+    menuToggle.addEventListener('click', () => {
+      sideMenu.style.right = '0';
+    });
+
+    menuClose.addEventListener('click', () => {
+      sideMenu.style.right = '-350px';
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!sideMenu.contains(e.target) && !menuToggle.contains(e.target)) {
+        sideMenu.style.right = '-350px';
+      }
+    });
+  }
+</script>
 </body>
 </html>

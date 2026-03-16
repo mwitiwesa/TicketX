@@ -1,0 +1,85 @@
+{% extends "admin/base_site.html" %}
+
+{% block content_title %}<h1>QR Ticket Scanner</h1>{% endblock %}
+
+{% block content %}
+  <div style="max-width: 900px; margin: 2rem auto; text-align: center;">
+    <h2>Live Ticket Scanner</h2>
+    <p>Point camera at the QR code on the back of the ticket</p>
+
+    <video id="video" width="100%" height="auto" autoplay playsinline style="border: 5px solid #4caf50; border-radius: 12px;"></video>
+    <canvas id="canvas" style="display:none;"></canvas>
+
+    <div id="result" style="margin-top: 2rem; padding: 1.5rem; font-size: 1.4rem; min-height: 120px;"></div>
+
+    <div id="actions" style="margin-top: 1rem; display: none;">
+      <button onclick="approveTicket()" class="btn btn-success btn-lg">Approve / Entry Granted</button>
+      <button onclick="cancelTicket()" class="btn btn-danger btn-lg">Cancel Ticket</button>
+      <button onclick="chaseTicket()" class="btn btn-warning btn-lg">Chase / Mark Attended</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+  <script>
+    let currentBookingId = null;
+    let currentTicketIndex = null;
+
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const result = document.getElementById('result');
+    const actions = document.getElementById('actions');
+
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+      .then(stream => { video.srcObject = stream; video.play(); requestAnimationFrame(scan); })
+      .catch(() => result.innerHTML = '<span style="color:red">Camera access denied</span>');
+
+    function scan() {
+      if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+
+        const code = jsQR(canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height).data, canvas.width, canvas.height);
+        if (code) validateTicket(code.data);
+      }
+      requestAnimationFrame(scan);
+    }
+
+    function validateTicket(data) {
+      fetch("{% url 'bookings:validate_qr' %}", {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}'},
+        body: JSON.stringify({ qr_data: data })
+      })
+      .then(r => r.json())
+      .then(res => {
+        if (res.valid) {
+          currentBookingId = res.booking_id;
+          currentTicketIndex = res.ticket_index;
+          result.innerHTML = `<span style="color:#4caf50">VALID TICKET<br>${res.message}</span>`;
+          actions.style.display = 'block';
+        } else {
+          result.innerHTML = `<span style="color:#f44336">INVALID TICKET<br>${res.message}</span>`;
+          actions.style.display = 'none';
+        }
+      });
+    }
+
+    function approveTicket() { actionTicket('approve'); }
+    function cancelTicket() { actionTicket('cancel'); }
+    function chaseTicket() { actionTicket('chase'); }
+
+    function actionTicket(action) {
+      fetch(`/bookings/ticket-action/${currentBookingId}/`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}'},
+        body: JSON.stringify({ action: action, ticket_index: currentTicketIndex })
+      })
+      .then(r => r.json())
+      .then(res => {
+        result.innerHTML = `<span style="color:#4caf50">${res.message}</span>`;
+        actions.style.display = 'none';
+      });
+    }
+  </script>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Attendee Names{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <h2>Add Attendee Names</h2>
+  <p>For booking #{{ booking.id }} – {{ booking.quantity }} tickets</p>
+
+  <form method="post">
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="mb-3">
+        {{ field.label_tag }}
+        {{ field }}
+        {{ field.errors }}
+      </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">Save Names</button>
+  </form>
+</div>
+{% endblock %}

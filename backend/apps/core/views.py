@@ -1,8 +1,10 @@
 from django.shortcuts import render
 from django.db.models import Q
 from apps.events.models import Event
+from apps.bookings.models import Booking  # ← THIS LINE WAS MISSING - now fixed
 from datetime import date, timedelta
 from apps.calendar_view.utils import get_calendar_data
+from django.core.paginator import Paginator
 
 
 def home(request):
@@ -28,6 +30,19 @@ def home(request):
         event_date__gt=today
     ).order_by('event_date', 'event_time')[:12]  # show up to 12 for carousel
 
+    # Only show bookings if user is logged in
+    user_bookings = None
+    if request.user.is_authenticated:
+        user_bookings = Booking.objects.filter(
+            user=request.user,
+            status__in=['PENDING', 'PAID']
+        ).order_by('-created_at')
+
+        # Pagination (5 bookings per page)
+        paginator = Paginator(user_bookings, 5)
+        page_number = request.GET.get('page')
+        user_bookings = paginator.get_page(page_number)
+
     # Calendar data (based on URL year/month)
     calendar_data = get_calendar_data(year=year, month=month)
 
@@ -43,6 +58,7 @@ def home(request):
         'prev_year': calendar_data['prev_year'],
         'next_month': calendar_data['next_month'],
         'next_year': calendar_data['next_year'],
+        'user_bookings': user_bookings,  # can be None if not logged in
     }
 
     return render(request, 'core/home.html', context)

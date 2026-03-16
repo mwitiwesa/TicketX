@@ -1,51 +1,65 @@
+import io
+from io import BytesIO
+import uuid
+import json
+import qrcode
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
+from django.http import HttpResponse, JsonResponse
+from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
+
+from reportlab.lib.pagesizes import portrait
+from reportlab.lib.units import mm
+from reportlab.pdfgen import canvas
+from reportlab.lib.colors import white, black, orange, lightgrey
+
+from PIL import Image as PILImage
 
 from .models import Booking
-from .forms import BookingForm
 from apps.events.models import Ticket
 
 
 @login_required
 def booking_create(request, ticket_id):
-    """
-    View for selecting ticket quantity and creating a pending booking.
-    Redirects to checkout page on success.
-    """
     ticket = get_object_or_404(Ticket, id=ticket_id)
     event = ticket.event
 
     if request.method == 'POST':
-        form = BookingForm(request.POST)
-        if form.is_valid():
-            quantity = form.cleaned_data['quantity']
+        quantity = request.POST.get('quantity')
+        try:
+            quantity = int(quantity)
+            if quantity < 1:
+                raise ValueError
+        except (ValueError, TypeError):
+            messages.error(request, "Please enter a valid quantity (at least 1).")
+            return render(request, 'bookings/booking_form.html', {
+                'ticket': ticket,
+                'event': event,
+            })
 
-            # Check availability before saving
-            if quantity > ticket.tickets_remaining:
-                messages.error(request, f"Only {ticket.tickets_remaining} tickets remaining.")
-                return render(request, 'bookings/booking_form.html', {
-                    'form': form,
-                    'ticket': ticket,
-                    'event': event,
-                })
+        if quantity > ticket.tickets_remaining:
+            messages.error(request, f"Only {ticket.tickets_remaining} tickets remaining.")
+            return render(request, 'bookings/booking_form.html', {
+                'ticket': ticket,
+                'event': event,
+            })
 
-            booking = form.save(commit=False)
-            booking.user = request.user
-            booking.ticket = ticket
-            booking.total_price = ticket.price * quantity
-            booking.status = 'PENDING'
-            booking.save()
+        booking = Booking.objects.create(
+            user=request.user,
+            ticket=ticket,
+            quantity=quantity,
+            total_price=ticket.price * quantity,
+            status='PENDING'
+        )
 
-            messages.success(request, "Booking created successfully! Proceed to payment.")
-            return redirect('bookings:checkout', booking_id=booking.id)
-        else:
-            messages.error(request, "Please correct the errors below.")
-    else:
-        form = BookingForm(initial={'quantity': 1})
+        messages.success(request, "Booking created successfully! Proceed to payment.")
+        return redirect('bookings:checkout', booking_id=booking.id)
 
     return render(request, 'bookings/booking_form.html', {
-        'form': form,
         'ticket': ticket,
         'event': event,
     })
@@ -53,10 +67,6 @@ def booking_create(request, ticket_id):
 
 @login_required
 def checkout(request, booking_id):
-    """
-    Displays checkout page (GET) — payment initiation will be handled by Buni later.
-    For now, shows placeholder message until Buni integration.
-    """
     booking = get_object_or_404(Booking, id=booking_id, user=request.user)
 
     if booking.status != 'PENDING':
@@ -64,9 +74,8 @@ def checkout(request, booking_id):
         return redirect('events:event_detail', pk=booking.ticket.event.pk)
 
     if request.method == 'POST':
-        # Placeholder: Buni integration will go here later
         messages.info(request, "Buni payment integration is coming soon. Booking reserved!")
-        return redirect('bookings:checkout', booking_id=booking.id)
+        return redirect('bookings:booking_detail', booking_id=booking.id)
 
     return render(request, 'bookings/checkout.html', {
         'booking': booking,
@@ -77,13 +86,220 @@ def checkout(request, booking_id):
 
 @login_required
 def booking_detail(request, booking_id):
-    """
-    Optional: View to show booking status and download ticket if PAID.
-    """
     booking = get_object_or_404(Booking, id=booking_id, user=request.user)
 
-    return render(request, 'bookings/booking_detail.html', {
+    context = {
         'booking': booking,
         'ticket': booking.ticket,
         'event': booking.ticket.event,
-    })
+    }
+
+    return render(request, 'bookings/booking_detail.html', context)
+
+
+@login_required
+def download_tickets(request, booking_id):
+    """
+    Generate PDF tickets with:
+    - Front: event poster background + ticket type + attendee name
+    - Back: event details + UNIQUE QR code (new every download)
+    - QR code raised higher to avoid overlapping footer
+    """
+    booking = get_object_or_404(Booking, id=booking_id, user=request.user)
+
+    if not booking.is_paid:
+        messages.error(request, "Tickets can only be downloaded after payment.")
+        return redirect('bookings:booking_detail', booking_id=booking.id)
+
+    buffer = io.BytesIO()
+    pdf = canvas.Canvas(buffer, pagesize=(85*mm, 55*mm))
+
+    # Handle attendee names safely
+    attendee_data = booking.attendee_names
+
+    if isinstance(attendee_data, str):
+        try:
+            attendee_data = json.loads(attendee_data)
+        except json.JSONDecodeError:
+            attendee_data = []
+
+    if booking.quantity == 1 or not attendee_data:
+        user = booking.user
+        if hasattr(user, 'first_name') and hasattr(user, 'last_name'):
+            buyer_name = f"{user.first_name} {user.last_name}".strip()
+        else:
+            email_prefix = user.email.split('@')[0]
+            buyer_name = email_prefix.replace('.', ' ').replace('_', ' ').title()
+        names = [buyer_name or "Attendee"]
+    else:
+        names = attendee_data[:booking.quantity]
+
+    for idx, attendee in enumerate(names):
+        pdf.setPageSize((85*mm, 55*mm))
+
+        # FRONT SIDE
+        if booking.ticket.event.image:
+            try:
+                img_path = booking.ticket.event.image.path
+                img = PILImage.open(img_path)
+                scale = max(85*mm / img.width, 55*mm / img.height)
+                w = img.width * scale
+                h = img.height * scale
+                x = (85*mm - w) / 2
+                y = (55*mm - h) / 2
+                pdf.drawInlineImage(img_path, x, y, width=w, height=h)
+            except:
+                pdf.setFillColor(black)
+                pdf.rect(0, 0, 85*mm, 55*mm, fill=1)
+
+        pdf.setFillColorRGB(0, 0, 0, 0.65)
+        pdf.rect(0, 0, 85*mm, 55*mm, fill=1)
+
+        pdf.setFillColor(white)
+        pdf.setFont("Helvetica-Bold", 13)
+        pdf.drawCentredString(42.5*mm, 32*mm, booking.ticket.name.upper())
+
+        pdf.setFont("Helvetica-Bold", 15)
+        pdf.drawCentredString(42.5*mm, 18*mm, attendee.upper()[:25])
+
+        pdf.showPage()
+
+        # BACK SIDE
+        pdf.setPageSize((85*mm, 55*mm))
+
+        pdf.setFillColorRGB(10/255, 10/255, 35/255)
+        pdf.rect(0, 0, 85*mm, 55*mm, fill=1)
+
+        pdf.setStrokeColorRGB(1, 0.5, 0)
+        pdf.setLineWidth(1.5)
+        pdf.rect(4*mm, 4*mm, 77*mm, 47*mm)
+
+        pdf.setFillColor(orange)
+        pdf.setFont("Helvetica-Bold", 11)
+        pdf.drawCentredString(42.5*mm, 48*mm, "EVENT DETAILS")
+
+        pdf.setFillColor(white)
+        pdf.setFont("Helvetica", 8)
+        y = 42*mm
+        lines = [
+            f"Location: {booking.ticket.event.location[:38]}",
+            f"Date: {booking.ticket.event.event_date.strftime('%d %b %Y')}",
+            f"Time: {booking.ticket.event.event_time.strftime('%I:%M %p')}",
+            f"Type: {booking.ticket.name}",
+        ]
+        for line in lines:
+            pdf.drawString(8*mm, y, line)
+            y -= 7*mm
+
+        pdf.setFont("Helvetica-Oblique", 7)
+        pdf.setFillColor(lightgrey)
+        pdf.drawCentredString(42.5*mm, 8*mm, "TicketX.co developed by Wesa Mwiti")
+
+        # UNIQUE QR CODE - regenerated every download
+        random_token = str(uuid.uuid4())[:8]
+        qr_data = f"https://{request.get_host()}/events/{booking.ticket.event.id}/?ticket={booking.id}-{idx+1}-{random_token}"
+
+        qr = qrcode.QRCode(version=1, box_size=5, border=2)
+        qr.add_data(qr_data)
+        qr.make(fit=True)
+        qr_img = qr.make_image(fill_color="black", back_color="white")
+
+        qr_buffer = BytesIO()
+        qr_img.save(qr_buffer, format="PNG")
+        qr_buffer.seek(0)
+
+        qr_pil = PILImage.open(qr_buffer)
+
+        pdf.drawInlineImage(qr_pil, 58*mm, 16*mm, width=22*mm, height=22*mm)
+
+        pdf.setFont("Helvetica", 6)
+        pdf.setFillColor(lightgrey)
+        pdf.drawCentredString(69*mm, 12*mm, "Scan to View Event")
+
+        if idx < len(names) - 1:
+            pdf.showPage()
+
+    pdf.save()
+    pdf_content = buffer.getvalue()
+    buffer.close()
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="ticketx_booking_{booking.id}.pdf"'
+    response.write(pdf_content)
+    return response
+
+
+@staff_member_required
+def qr_scanner(request):
+    return render(request, 'bookings/admin_qr_scanner.html')
+
+
+@staff_member_required
+@csrf_exempt
+def validate_qr(request):
+    if request.method == 'POST':
+        qr_data = request.POST.get('qr_data', '')
+        if not qr_data.startswith('https://') or '?ticket=' not in qr_data:
+            return JsonResponse({'valid': False, 'message': 'Invalid QR format'})
+
+        try:
+            ticket_part = qr_data.split('?ticket=')[1]
+            booking_id, idx, token = ticket_part.split('-')
+            booking = Booking.objects.get(id=booking_id)
+            return JsonResponse({
+                'valid': True,
+                'booking_id': booking.id,
+                'ticket_index': int(idx),
+                'message': f'Valid ticket #{idx} - {booking.ticket.event.title}'
+            })
+        except (ValueError, Booking.DoesNotExist):
+            return JsonResponse({'valid': False, 'message': 'Ticket not found or invalid'})
+
+    return JsonResponse({'valid': False, 'message': 'Invalid request'})
+
+
+@staff_member_required
+@csrf_exempt
+def ticket_action(request, booking_id):
+    """
+    Handle admin actions on scanned ticket:
+    - approve: mark as used/validated
+    - cancel: reject ticket
+    - chase: mark attended with optional note
+    """
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'message': 'Invalid request method'})
+
+    try:
+        booking = Booking.objects.get(id=booking_id)
+    except Booking.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'Booking not found'})
+
+    action = request.POST.get('action')
+    ticket_index = request.POST.get('ticket_index')  # optional, for multi-ticket bookings
+    note = request.POST.get('note', '').strip()[:200]  # optional note for chase
+
+    if action == 'approve':
+        if booking.is_used:
+            return JsonResponse({'success': False, 'message': 'Ticket already used'})
+        booking.is_used = True
+        booking.validated_at = timezone.now()
+        booking.scan_note = f"Approved at {timezone.now()} by {request.user}"
+        booking.save()
+        return JsonResponse({'success': True, 'message': 'Ticket approved - entry granted'})
+
+    elif action == 'cancel':
+        # Optional: you can add a cancelled status if needed
+        return JsonResponse({'success': True, 'message': 'Ticket cancelled/rejected'})
+
+    elif action == 'chase':
+        if booking.is_used:
+            return JsonResponse({'success': False, 'message': 'Ticket already used'})
+        booking.is_used = True
+        booking.validated_at = timezone.now()
+        booking.scan_note = f"Chased/Attended: {note or 'No note'} at {timezone.now()} by {request.user}"
+        booking.save()
+        return JsonResponse({'success': True, 'message': f'Ticket chased/attended - {note or "No note"}'})
+
+    else:
+        return JsonResponse({'success': False, 'message': 'Invalid action'})
