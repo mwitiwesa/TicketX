@@ -73,15 +73,49 @@ def checkout(request, booking_id):
         messages.error(request, "This booking cannot be paid anymore.")
         return redirect('events:event_detail', pk=booking.ticket.event.pk)
 
-    if request.method == 'POST':
-        messages.info(request, "Buni payment integration is coming soon. Booking reserved!")
-        return redirect('bookings:booking_detail', booking_id=booking.id)
+    promo_code = None
+    discount_amount = 0
+    final_total = booking.total_price
 
-    return render(request, 'bookings/checkout.html', {
+    if request.method == 'POST':
+        promo_input = request.POST.get('promo_code', '').strip().upper()
+
+        if promo_input:
+            try:
+                promo = PromoCode.objects.get(code=promo_input, is_active=True)
+                
+                # Check expiry and usage
+                if promo.expires_at and promo.expires_at < timezone.now():
+                    messages.error(request, "This promo code has expired.")
+                elif promo.used_count >= promo.max_uses:
+                    messages.error(request, "This promo code has reached its usage limit.")
+                else:
+                    # Apply discount
+                    discount_amount = booking.total_price * (promo.discount_percent / 100)
+                    final_total = booking.total_price - discount_amount
+                    
+                    # Optional: save promo usage
+                    promo.used_count += 1
+                    promo.save()
+                    
+                    messages.success(request, f"Promo code {promo.code} applied! {promo.discount_percent}% off")
+                    promo_code = promo
+                    
+            except PromoCode.DoesNotExist:
+                messages.error(request, "Invalid or inactive promo code.")
+
+        # TODO: Here is where BUni and the final total goes
+
+    context = {
         'booking': booking,
         'ticket': booking.ticket,
         'event': booking.ticket.event,
-    })
+        'promo_code': promo_code,
+        'discount_amount': discount_amount,
+        'final_total': final_total,
+    }
+
+    return render(request, 'bookings/checkout.html', context)
 
 
 @login_required

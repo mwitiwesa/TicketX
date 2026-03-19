@@ -71,3 +71,25 @@ class Booking(models.Model):
     @property
     def attendee_count(self):
         return len(self.attendee_names) if self.attendee_names else self.quantity
+    
+class PromoCode(models.Model):
+    code = models.CharField(max_length=20, unique=True, help_text="e.g. SUMMER30 or INFLUENCER50")
+    discount_percent = models.PositiveIntegerField(help_text="Discount percentage (e.g. 20, 30)")
+    description = models.CharField(max_length=200, blank=True)
+    is_active = models.BooleanField(default=True)
+    expires_at = models.DateTimeField(null=True, blank=True)
+    max_uses = models.PositiveIntegerField(default=100, help_text="Total times this code can be used")
+    used_count = models.PositiveIntegerField(default=0)
+    
+    # Target audience
+    target_group = models.ForeignKey('auth.Group', null=True, blank=True, on_delete=models.SET_NULL)
+    target_users = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.code} ({self.discount_percent}% off)"
+
+    class Meta:
+        verbose_name = "Promo Code"
+        verbose_name_plural = "Promo Codes"

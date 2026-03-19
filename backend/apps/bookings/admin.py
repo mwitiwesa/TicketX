@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import format_html
 from .models import Booking
-
+from .models import PromoCode
 
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
@@ -53,3 +53,11 @@ class BookingAdmin(admin.ModelAdmin):
             reverse('bookings:qr_scanner')
         ))
         return tools
+
+
+@admin.register(PromoCode)
+class PromoCodeAdmin(admin.ModelAdmin):
+    list_display = ('code', 'discount_percent', 'is_active', 'expires_at', 'used_count', 'max_uses')
+    list_filter = ('is_active', 'target_group')
+    search_fields = ('code', 'description')
+    readonly_fields = ('used_count',)
