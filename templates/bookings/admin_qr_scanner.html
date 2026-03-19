@@ -3,82 +3,94 @@
 {% block content_title %}<h1>QR Ticket Scanner</h1>{% endblock %}
 
 {% block content %}
-  <div style="max-width: 900px; margin: 2rem auto; text-align: center;">
-    <h2>Live Ticket Scanner</h2>
-    <p>Point camera at the QR code on the back of the ticket</p>
+  <style>
+    #video { width: 100%; max-width: 800px; border: 4px solid #4caf50; border-radius: 12px; }
+    #result { margin-top: 2rem; padding: 1.5rem; font-size: 1.4rem; border-radius: 8px; min-height: 100px; }
+    .btn-action { margin: 0.5rem; padding: 12px 24px; font-size: 1.1rem; }
+  </style>
 
-    <video id="video" width="100%" height="auto" autoplay playsinline style="border: 5px solid #4caf50; border-radius: 12px;"></video>
+  <div style="max-width: 900px; margin: 0 auto;">
+    <h2>Live Scanner – Validate Tickets</h2>
+    <p>Point camera at the QR code on the ticket back. Approve / Cancel / Chase after scan.</p>
+
+    <video id="video" autoplay playsinline></video>
     <canvas id="canvas" style="display:none;"></canvas>
 
-    <div id="result" style="margin-top: 2rem; padding: 1.5rem; font-size: 1.4rem; min-height: 120px;"></div>
+    <div id="result">Waiting for scan...</div>
 
-    <div id="actions" style="margin-top: 1rem; display: none;">
-      <button onclick="approveTicket()" class="btn btn-success btn-lg">Approve / Entry Granted</button>
-      <button onclick="cancelTicket()" class="btn btn-danger btn-lg">Cancel Ticket</button>
-      <button onclick="chaseTicket()" class="btn btn-warning btn-lg">Chase / Mark Attended</button>
+    <div id="actions" style="margin-top: 1.5rem; display: none;">
+      <button class="btn btn-success btn-action" onclick="action('approve')">Approve (Entry Granted)</button>
+      <button class="btn btn-danger btn-action" onclick="action('cancel')">Cancel Ticket</button>
+      <button class="btn btn-warning btn-action" onclick="action('chase')">Chase / Mark Attended</button>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
   <script>
-    let currentBookingId = null;
-    let currentTicketIndex = null;
-
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('canvas');
-    const result = document.getElementById('result');
-    const actions = document.getElementById('actions');
+    let currentData = null;
 
     navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-      .then(stream => { video.srcObject = stream; video.play(); requestAnimationFrame(scan); })
-      .catch(() => result.innerHTML = '<span style="color:red">Camera access denied</span>');
+      .then(stream => {
+        document.getElementById('video').srcObject = stream;
+        requestAnimationFrame(scan);
+      })
+      .catch(err => {
+        document.getElementById('result').innerHTML = '<span style="color:red">Camera error: ' + err + '</span>';
+      });
 
     function scan() {
+      const video = document.getElementById('video');
+      const canvas = document.getElementById('canvas');
       if (video.readyState === video.HAVE_ENOUGH_DATA) {
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         canvas.getContext('2d').drawImage(video, 0, 0);
 
         const code = jsQR(canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height).data, canvas.width, canvas.height);
-        if (code) validateTicket(code.data);
+        if (code) {
+          currentData = code.data;
+          validate(currentData);
+        }
       }
       requestAnimationFrame(scan);
     }
 
-    function validateTicket(data) {
+    function validate(data) {
       fetch("{% url 'bookings:validate_qr' %}", {
         method: 'POST',
-        headers: {'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}'},
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token }}'
+        },
         body: JSON.stringify({ qr_data: data })
       })
       .then(r => r.json())
       .then(res => {
+        const result = document.getElementById('result');
+        const actions = document.getElementById('actions');
         if (res.valid) {
-          currentBookingId = res.booking_id;
-          currentTicketIndex = res.ticket_index;
-          result.innerHTML = `<span style="color:#4caf50">VALID TICKET<br>${res.message}</span>`;
+          result.innerHTML = `<span style="color:#4caf50; font-weight:bold;">VALID TICKET<br>${res.message}</span>`;
           actions.style.display = 'block';
         } else {
-          result.innerHTML = `<span style="color:#f44336">INVALID TICKET<br>${res.message}</span>`;
+          result.innerHTML = `<span style="color:#f44336; font-weight:bold;">INVALID<br>${res.message}</span>`;
           actions.style.display = 'none';
         }
       });
     }
 
-    function approveTicket() { actionTicket('approve'); }
-    function cancelTicket() { actionTicket('cancel'); }
-    function chaseTicket() { actionTicket('chase'); }
-
-    function actionTicket(action) {
-      fetch(`/bookings/ticket-action/${currentBookingId}/`, {
+    function action(type) {
+      fetch("{% url 'bookings:validate_qr' %}", {  // reuse or make new endpoint
         method: 'POST',
-        headers: {'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}'},
-        body: JSON.stringify({ action: action, ticket_index: currentTicketIndex })
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({ qr_data: currentData, action: type })
       })
       .then(r => r.json())
       .then(res => {
-        result.innerHTML = `<span style="color:#4caf50">${res.message}</span>`;
-        actions.style.display = 'none';
+        document.getElementById('result').innerHTML = `<span style="color:#4caf50">${res.message}</span>`;
+        document.getElementById('actions').style.display = 'none';
       });
     }
   </script>
