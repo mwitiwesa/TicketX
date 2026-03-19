@@ -11,6 +11,7 @@ from django.contrib import messages
 from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
+from decimal import Decimal
 
 from reportlab.lib.pagesizes import portrait
 from reportlab.lib.units import mm
@@ -19,12 +20,16 @@ from reportlab.lib.colors import white, black, orange, lightgrey
 
 from PIL import Image as PILImage
 
-from .models import Booking
+from .models import Booking, PromoCode
 from apps.events.models import Ticket
 
 
 @login_required
 def booking_create(request, ticket_id):
+    """
+    View for selecting ticket quantity and creating a pending booking.
+    Redirects to checkout after successful creation.
+    """
     ticket = get_object_or_404(Ticket, id=ticket_id)
     event = ticket.event
 
@@ -67,6 +72,9 @@ def booking_create(request, ticket_id):
 
 @login_required
 def checkout(request, booking_id):
+    """
+    Displays checkout page and handles promo code application before payment.
+    """
     booking = get_object_or_404(Booking, id=booking_id, user=request.user)
 
     if booking.status != 'PENDING':
@@ -74,7 +82,7 @@ def checkout(request, booking_id):
         return redirect('events:event_detail', pk=booking.ticket.event.pk)
 
     promo_code = None
-    discount_amount = 0
+    discount_amount = Decimal('0.00')
     final_total = booking.total_price
 
     if request.method == 'POST':
@@ -83,28 +91,27 @@ def checkout(request, booking_id):
         if promo_input:
             try:
                 promo = PromoCode.objects.get(code=promo_input, is_active=True)
-                
+
                 # Check expiry and usage
                 if promo.expires_at and promo.expires_at < timezone.now():
                     messages.error(request, "This promo code has expired.")
                 elif promo.used_count >= promo.max_uses:
                     messages.error(request, "This promo code has reached its usage limit.")
                 else:
-                    # Apply discount
-                    discount_amount = booking.total_price * (promo.discount_percent / 100)
+                    # Apply discount – all in Decimal
+                    discount_rate = Decimal(promo.discount_percent) / Decimal('100')
+                    discount_amount = booking.total_price * discount_rate
                     final_total = booking.total_price - discount_amount
-                    
-                    # Optional: save promo usage
+
+                    # Save promo usage
                     promo.used_count += 1
                     promo.save()
-                    
+
                     messages.success(request, f"Promo code {promo.code} applied! {promo.discount_percent}% off")
                     promo_code = promo
-                    
+
             except PromoCode.DoesNotExist:
                 messages.error(request, "Invalid or inactive promo code.")
-
-        # TODO: Here is where BUni and the final total goes
 
     context = {
         'booking': booking,
@@ -148,7 +155,6 @@ def download_tickets(request, booking_id):
     buffer = io.BytesIO()
     pdf = canvas.Canvas(buffer, pagesize=(85*mm, 55*mm))
 
-    # Handle attendee names safely
     attendee_data = booking.attendee_names
 
     if isinstance(attendee_data, str):
@@ -171,7 +177,6 @@ def download_tickets(request, booking_id):
     for idx, attendee in enumerate(names):
         pdf.setPageSize((85*mm, 55*mm))
 
-        # FRONT SIDE
         if booking.ticket.event.image:
             try:
                 img_path = booking.ticket.event.image.path
@@ -198,7 +203,6 @@ def download_tickets(request, booking_id):
 
         pdf.showPage()
 
-        # BACK SIDE
         pdf.setPageSize((85*mm, 55*mm))
 
         pdf.setFillColorRGB(10/255, 10/255, 35/255)
@@ -229,7 +233,6 @@ def download_tickets(request, booking_id):
         pdf.setFillColor(lightgrey)
         pdf.drawCentredString(42.5*mm, 8*mm, "TicketX.co developed by Wesa Mwiti")
 
-        # UNIQUE QR CODE - regenerated every download
         random_token = str(uuid.uuid4())[:8]
         qr_data = f"https://{request.get_host()}/events/{booking.ticket.event.id}/?ticket={booking.id}-{idx+1}-{random_token}"
 
@@ -310,8 +313,8 @@ def ticket_action(request, booking_id):
         return JsonResponse({'success': False, 'message': 'Booking not found'})
 
     action = request.POST.get('action')
-    ticket_index = request.POST.get('ticket_index')  # optional, for multi-ticket bookings
-    note = request.POST.get('note', '').strip()[:200]  # optional note for chase
+    ticket_index = request.POST.get('ticket_index')  # optional
+    note = request.POST.get('note', '').strip()[:200]
 
     if action == 'approve':
         if booking.is_used:
@@ -323,7 +326,6 @@ def ticket_action(request, booking_id):
         return JsonResponse({'success': True, 'message': 'Ticket approved - entry granted'})
 
     elif action == 'cancel':
-        # Optional: you can add a cancelled status if needed
         return JsonResponse({'success': True, 'message': 'Ticket cancelled/rejected'})
 
     elif action == 'chase':
