@@ -16,7 +16,7 @@ def register(request):
             user.is_active = True
             user.save()
             login(request, user)  # Log them in immediately after registration
-            messages.success(request, "Registration successful! Welcome to TicketX.")
+            messages.success(request, "Registration successful! Welcome to Ticket2X.")
             return redirect('core:home')
         else:
             messages.error(request, "Please correct the errors below.")

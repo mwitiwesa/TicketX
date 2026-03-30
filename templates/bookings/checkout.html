@@ -1,13 +1,10 @@
 {% extends 'base.html' %}
-
-{% block title %}Checkout - TicketX{% endblock %}
-
+{% block title %}Checkout - Ticket2X{% endblock %}
 {% block content %}
   <div class="container py-5">
     <div class="row justify-content-center">
       <div class="col-lg-6 col-md-8">
 
-        <!-- Django messages (success/error) -->
         {% if messages %}
           <div class="mb-4">
             {% for message in messages %}
@@ -19,13 +16,14 @@
           </div>
         {% endif %}
 
-        <div class="card shadow-lg border-0" style="border-radius: 16px; background: #111; overflow: hidden;">
-          <!-- Card Header -->
+        <div class="card shadow-lg border-0" style="border-radius: 16px; background: #111;">
+
           <div class="card-header text-center py-4" style="background: linear-gradient(135deg, #d32f2f, #b71c1c); color: white;">
             <h2 class="mb-0">Complete Payment</h2>
           </div>
 
           <div class="card-body p-4 p-md-5">
+
             <!-- Booking Summary -->
             <div class="text-center mb-5">
               <h4 class="text-danger fw-bold mb-2">
@@ -33,15 +31,39 @@
               </h4>
               <p class="text-muted mb-1">Event: {{ booking.ticket.event.title }}</p>
               <p class="h3 fw-bold text-danger mt-3">
-                KES {{ booking.total_price|floatformat:2 }}
+                Original: KES {{ booking.total_price|floatformat:2 }}
               </p>
-              <small class="text-muted">Total Amount</small>
             </div>
 
-            <!-- Payment Form -->
+            <!-- PROMO CODE SECTION -->
+            <div class="promo-section mb-5" style="padding: 1.5rem; background: rgba(255,152,0,0.1); border: 1px solid #ff9800; border-radius: 12px;">
+              <h4 class="text-center mb-3" style="color: #ff9800;">Have a Promo Code?</h4>
+              
+              <form method="post" action="{% url 'bookings:checkout' booking.id %}">
+                {% csrf_token %}
+                <div class="input-group input-group-lg">
+                  <input type="text" name="promo_code" id="promo-input" 
+                         placeholder="Enter promo code (e.g. SUMMER30)" 
+                         class="form-control" style="background: #222; color: #eee; border: 1px solid #444;">
+                  <button type="submit" class="btn btn-warning">Apply</button>
+                </div>
+              </form>
+
+              {% if discount_amount > 0 %}
+                <div class="mt-3 text-center" style="color: #4caf50; font-weight: bold;">
+                  Discount Applied: KES {{ discount_amount|floatformat:2 }} ({{ promo_code.discount_percent }}%)
+                </div>
+              {% endif %}
+            </div>
+
+            <!-- Final Total -->
+            <p class="text-center h3 fw-bold text-danger mt-4 mb-5">
+              Final to Pay: KES {{ final_total|floatformat:2 }}
+            </p>
+
+            <!-- FINAL PAYMENT FORM -->
             <form method="post" action="{% url 'bookings:checkout' booking.id %}">
               {% csrf_token %}
-
               <div class="mb-4">
                 <label for="phone" class="form-label text-center d-block mb-3 fw-bold" style="color: #ddd; font-size: 1.1rem;">
                   M-Pesa Phone Number
@@ -56,17 +78,17 @@
               </div>
 
               <button type="submit" class="btn btn-danger btn-lg w-100 py-3 fw-bold" style="font-size: 1.2rem; border-radius: 10px;">
-                Pay with M-Pesa
+                Pay KES {{ final_total|floatformat:2 }} with M-Pesa
               </button>
             </form>
 
-            <!-- Info Note -->
             <div class="text-center mt-4">
               <small class="text-muted">
                 You will receive a prompt on your phone to enter your PIN.<br>
                 Booking is reserved until payment is completed.
               </small>
             </div>
+
           </div>
         </div>
       </div>

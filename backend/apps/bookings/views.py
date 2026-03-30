@@ -73,10 +73,6 @@ def booking_create(request, ticket_id):
 
 @login_required
 def checkout(request, booking_id):
-    """
-    Displays checkout page and handles promo code application before payment.
-    Promo must match the event of the ticket.
-    """
     booking = get_object_or_404(Booking, id=booking_id, user=request.user)
 
     if booking.status != 'PENDING':
@@ -88,34 +84,45 @@ def checkout(request, booking_id):
     final_total = booking.total_price
 
     if request.method == 'POST':
-        promo_input = request.POST.get('promo_code', '').strip().upper()
+        # Check if this is a promo code submission
+        if 'promo_code' in request.POST:
+            promo_input = request.POST.get('promo_code', '').strip().upper()
 
-        if promo_input:
-            try:
-                promo = PromoCode.objects.get(
-                    code=promo_input,
-                    is_active=True,
-                    event=booking.ticket.event  # Only works for this event
-                )
+            if promo_input:
+                try:
+                    promo = PromoCode.objects.get(
+                        code=promo_input,
+                        is_active=True,
+                        event=booking.ticket.event
+                    )
 
-                # Check expiry and usage
-                if promo.expires_at and promo.expires_at < timezone.now():
-                    messages.error(request, "This promo code has expired.")
-                elif promo.used_count >= promo.max_uses:
-                    messages.error(request, "This promo code has reached its usage limit.")
-                else:
-                    discount_rate = Decimal(promo.discount_percent) / Decimal('100')
-                    discount_amount = booking.total_price * discount_rate
-                    final_total = booking.total_price - discount_amount
+                    if promo.expires_at and promo.expires_at < timezone.now():
+                        messages.error(request, "This promo code has expired.")
+                    elif promo.used_count >= promo.max_uses:
+                        messages.error(request, "This promo code has reached its usage limit.")
+                    else:
+                        discount_rate = Decimal(promo.discount_percent) / Decimal('100')
+                        discount_amount = booking.total_price * discount_rate
+                        final_total = booking.total_price - discount_amount
 
-                    promo.used_count += 1
-                    promo.save()
+                        promo.used_count += 1
+                        promo.save()
 
-                    messages.success(request, f"Promo code {promo.code} applied! {promo.discount_percent}% off")
-                    promo_code = promo
+                        messages.success(request, f"Promo code {promo.code} applied! {promo.discount_percent}% off")
+                        promo_code = promo
 
-            except PromoCode.DoesNotExist:
-                messages.error(request, "Invalid promo code for this event.")
+                except PromoCode.DoesNotExist:
+                    messages.error(request, "Invalid promo code for this event.")
+
+            # After promo is applied, stay on the same page (no redirect to payment yet)
+            # We will handle payment in a separate POST
+
+        # If this is the final payment submission (phone number submitted)
+        elif 'phone' in request.POST:
+            # TODO: Here you will call Buni with final_total
+            messages.info(request, f"Payment initiated for KES {final_total} with Buni...")
+            # For now just redirect to detail with success
+            return redirect('bookings:booking_detail', booking_id=booking.id)
 
     context = {
         'booking': booking,
@@ -235,7 +242,7 @@ def download_tickets(request, booking_id):
 
         pdf.setFont("Helvetica-Oblique", 7)
         pdf.setFillColor(lightgrey)
-        pdf.drawCentredString(42.5*mm, 8*mm, "TicketX.co developed by Wesa Mwiti")
+        pdf.drawCentredString(42.5*mm, 8*mm, "Ticket2X.com developed by Wesa Mwiti")
 
         random_token = str(uuid.uuid4())[:8]
         qr_data = f"https://{request.get_host()}/events/{booking.ticket.event.id}/?ticket={booking.id}-{idx+1}-{random_token}"
