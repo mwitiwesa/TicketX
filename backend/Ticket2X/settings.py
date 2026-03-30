@@ -46,7 +46,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'TicketX.urls'
+ROOT_URLCONF = 'Ticket2X.urls'
 
 TEMPLATES = [
     {
@@ -64,7 +64,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'TicketX.wsgi.application'
+WSGI_APPLICATION = 'Ticket2X.wsgi.application'
 
 # Database - Use SQLite locally, PostgreSQL on production (Render will set DATABASE_URL)
 DATABASES = {
