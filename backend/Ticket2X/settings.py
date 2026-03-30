@@ -12,7 +12,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-this-to-a-very-long-random-string-1234567890')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
+DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
 # Allowed hosts - Add your deployed domain here
 ALLOWED_HOSTS = ['ticket2x.onrender.com']  # Add your actual domain later
@@ -50,8 +50,8 @@ ROOT_URLCONF = 'Ticket2X.urls'
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        ''BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates'],   # ← This line is important
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
