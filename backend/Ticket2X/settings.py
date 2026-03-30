@@ -15,7 +15,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-this-to-a-very
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
 # Allowed hosts - Add your deployed domain here
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '.onrender.com', '.vercel.app']  # Add your actual domain later
+ALLOWED_HOSTS = ['ticket2x.onrender.com']  # Add your actual domain later
 
 # Application definition
 INSTALLED_APPS = [
