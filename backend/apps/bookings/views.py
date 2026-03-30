@@ -3,6 +3,7 @@ from io import BytesIO
 import uuid
 import json
 import qrcode
+import random
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
@@ -74,6 +75,7 @@ def booking_create(request, ticket_id):
 def checkout(request, booking_id):
     """
     Displays checkout page and handles promo code application before payment.
+    Promo must match the event of the ticket.
     """
     booking = get_object_or_404(Booking, id=booking_id, user=request.user)
 
@@ -90,7 +92,11 @@ def checkout(request, booking_id):
 
         if promo_input:
             try:
-                promo = PromoCode.objects.get(code=promo_input, is_active=True)
+                promo = PromoCode.objects.get(
+                    code=promo_input,
+                    is_active=True,
+                    event=booking.ticket.event  # Only works for this event
+                )
 
                 # Check expiry and usage
                 if promo.expires_at and promo.expires_at < timezone.now():
@@ -98,12 +104,10 @@ def checkout(request, booking_id):
                 elif promo.used_count >= promo.max_uses:
                     messages.error(request, "This promo code has reached its usage limit.")
                 else:
-                    # Apply discount – all in Decimal
                     discount_rate = Decimal(promo.discount_percent) / Decimal('100')
                     discount_amount = booking.total_price * discount_rate
                     final_total = booking.total_price - discount_amount
 
-                    # Save promo usage
                     promo.used_count += 1
                     promo.save()
 
@@ -111,7 +115,7 @@ def checkout(request, booking_id):
                     promo_code = promo
 
             except PromoCode.DoesNotExist:
-                messages.error(request, "Invalid or inactive promo code.")
+                messages.error(request, "Invalid promo code for this event.")
 
     context = {
         'booking': booking,
@@ -295,47 +299,34 @@ def validate_qr(request):
     return JsonResponse({'valid': False, 'message': 'Invalid request'})
 
 
+# ──────────────────────────────────────────────
+# NEW: Admin view to generate random 6-digit promo code for a specific event
+# ──────────────────────────────────────────────
 @staff_member_required
-@csrf_exempt
-def ticket_action(request, booking_id):
+def generate_promo_code(request, event_id):
     """
-    Handle admin actions on scanned ticket:
-    - approve: mark as used/validated
-    - cancel: reject ticket
-    - chase: mark attended with optional note
+    Generate a random 6-digit numeric promo code for a specific event.
+    Admin can call this from event change page or promo list.
     """
-    if request.method != 'POST':
-        return JsonResponse({'success': False, 'message': 'Invalid request method'})
+    if request.method == 'POST':
+        # Generate random 6-digit code
+        code = ''.join(random.choices('0123456789', k=6))  # e.g. "483921"
 
-    try:
-        booking = Booking.objects.get(id=booking_id)
-    except Booking.DoesNotExist:
-        return JsonResponse({'success': False, 'message': 'Booking not found'})
+        # Ensure uniqueness
+        while PromoCode.objects.filter(code=code).exists():
+            code = ''.join(random.choices('0123456789', k=6))
 
-    action = request.POST.get('action')
-    ticket_index = request.POST.get('ticket_index')  # optional
-    note = request.POST.get('note', '').strip()[:200]
+        # Create promo tied to this event
+        promo = PromoCode.objects.create(
+            code=code,
+            discount_percent=10,  # default – edit in admin
+            event_id=event_id,
+            max_uses=50,          # default – edit in admin
+            description=f"Generated for event {event_id}",
+            is_active=True
+        )
 
-    if action == 'approve':
-        if booking.is_used:
-            return JsonResponse({'success': False, 'message': 'Ticket already used'})
-        booking.is_used = True
-        booking.validated_at = timezone.now()
-        booking.scan_note = f"Approved at {timezone.now()} by {request.user}"
-        booking.save()
-        return JsonResponse({'success': True, 'message': 'Ticket approved - entry granted'})
+        messages.success(request, f"New promo code generated: **{code}** (10% off – edit in admin)")
+        return redirect('admin:bookings_promocode_changelist')  # go to promo list
 
-    elif action == 'cancel':
-        return JsonResponse({'success': True, 'message': 'Ticket cancelled/rejected'})
-
-    elif action == 'chase':
-        if booking.is_used:
-            return JsonResponse({'success': False, 'message': 'Ticket already used'})
-        booking.is_used = True
-        booking.validated_at = timezone.now()
-        booking.scan_note = f"Chased/Attended: {note or 'No note'} at {timezone.now()} by {request.user}"
-        booking.save()
-        return JsonResponse({'success': True, 'message': f'Ticket chased/attended - {note or "No note"}'})
-
-    else:
-        return JsonResponse({'success': False, 'message': 'Invalid action'})
+    return redirect('admin:bookings_promocode_changelist')
