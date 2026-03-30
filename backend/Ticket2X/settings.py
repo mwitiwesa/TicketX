@@ -50,8 +50,8 @@ ROOT_URLCONF = 'Ticket2X.urls'
 
 TEMPLATES = [
     {
-        ''BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],   # ← This line is important
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
