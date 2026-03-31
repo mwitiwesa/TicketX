@@ -3,12 +3,8 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
-        """
-        Creates and saves a User with the given email and password.
-        """
         if not email:
             raise ValueError('The Email field must be set')
         
@@ -19,9 +15,6 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
-        """
-        Creates and saves a superuser with the given email and password.
-        """
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
@@ -34,9 +27,10 @@ class UserManager(BaseUserManager):
             raise ValueError('Superuser must have is_superuser=True.')
 
         return self.create_user(email, password, **extra_fields)
-    
+
+
 class User(AbstractBaseUser, PermissionsMixin):
-    ROLE_CHOICES  = (
+    ROLE_CHOICES = (
         ('ADMIN', 'Admin'),
         ('CLIENT', 'Client'),
     )
@@ -49,8 +43,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        related_name='created_admins',
-        verbose_name=_('created_by')
+        related_name='created_admins'
     )
 
     is_active = models.BooleanField(default=True)
@@ -64,7 +57,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
-    
+
     @property
     def is_admin(self):
-        return self.role  == 'ADMIN'
+        return self.role == 'ADMIN'
