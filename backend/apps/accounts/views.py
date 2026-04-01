@@ -29,7 +29,7 @@ def register(request):
 def debug_login(request):
     """Temporary debug view to force login as superuser"""
     try:
-        user = User.objects.get(email='admin@ticket2x.com')
+        user = User.objects.get(email='admin2@ticket2x.com')
         login(request, user)
         return HttpResponse(
             f"<h2>Logged in successfully as {user.email}</h2>"
@@ -39,7 +39,7 @@ def debug_login(request):
             f"<br><a href='/admin/'>Go to Admin Panel</a>"
         )
     except User.DoesNotExist:
-        return HttpResponse("User 'admin@ticket2x.com' not found. Please create it first.")
+        return HttpResponse("User 'admin2@ticket2x.com' not found. Please create it first.")
     except Exception as e:
         return HttpResponse(f"Error: {str(e)}")
 
