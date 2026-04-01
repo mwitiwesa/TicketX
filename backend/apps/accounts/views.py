@@ -46,7 +46,7 @@ def debug_login(request):
 def force_login(request):
     """Temporary force login - bypasses password check"""
     try:
-        user = User.objects.get(email='admin@ticket2x.com')
+        user = User.objects.get(email='admin2@ticket2x.com')
         login(request, user)
         return HttpResponse(f"""
             <h2>Force Login Successful!</h2>
@@ -58,6 +58,6 @@ def force_login(request):
             <a href="/admin/" style="font-size:20px;">Go to Admin Panel →</a>
         """)
     except User.DoesNotExist:
-        return HttpResponse("User 'admin@ticket2x.com' not found.")
+        return HttpResponse("User 'admin2@ticket2x.com' not found.")
     except Exception as e:
         return HttpResponse(f"Error: {str(e)}")
