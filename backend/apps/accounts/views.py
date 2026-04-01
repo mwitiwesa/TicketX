@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib import messages
-from django.http import HttpResponse
 from .forms import CustomUserCreationForm
+from django.http import HttpResponse
 from .models import User
 
 def register(request):
@@ -27,8 +27,8 @@ def register(request):
     return render(request, 'accounts/register.html', {'form': form})
 
 
+# Temporary debug views (you can remove these later)
 def debug_login(request):
-    """Temporary debug view"""
     try:
         user = User.objects.get(email='admin@ticket2x.com')
         login(request, user)
@@ -40,13 +40,12 @@ def debug_login(request):
             <br><a href='/admin/'>Go to Admin Panel</a>
         """)
     except User.DoesNotExist:
-        return HttpResponse("User 'admin@ticket2x.com' not found.")
+        return HttpResponse("User 'admin@ticket2x.com' not found. Please create it first.")
     except Exception as e:
         return HttpResponse(f"Error: {str(e)}")
 
 
 def force_login(request):
-    """Force login without password"""
     try:
         user = User.objects.get(email='admin@ticket2x.com')
         login(request, user)
