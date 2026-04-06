@@ -2,7 +2,6 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 class User(AbstractUser):
-    """Custom user model extending Django's built-in User"""
     ROLE_CHOICES = (
         ('ADMIN', 'Admin'),
         ('CLIENT', 'Client'),
@@ -12,4 +11,4 @@ class User(AbstractUser):
     is_main_admin = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.email or self.username
+        return self.username

@@ -21,11 +21,11 @@
     <form method="post" action="{% url 'accounts:login' %}">
       {% csrf_token %}
 
-      <div style="margin-bottom: 1.5rem;">
-        <label for="id_username" style="display: block; margin-bottom: 0.5rem; color: #ccc;">Email</label>
-        <input type="email" name="username" id="id_username" required autofocus
-               style="width: 100%; padding: 0.8rem; border-radius: 6px; border: 1px solid #444; background: #222; color: #eee;">
-      </div>
+     <div style="margin-bottom: 1.5rem;">
+    <label for="id_username" style="display: block; margin-bottom: 0.5rem; color: #ccc;">Email</label>
+    <input type="email" name="username" id="id_username" required autofocus
+           style="width: 100%; padding: 0.8rem; border-radius: 6px; border: 1px solid #444; background: #222; color: #eee;">
+    </div>
 
       <div style="margin-bottom: 1.8rem;">
         <label for="id_password" style="display: block; margin-bottom: 0.5rem; color: #ccc;">Password</label>

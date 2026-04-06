@@ -6,16 +6,17 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    # App URL includes — we'll create these url files next steps
+    # Accounts app (custom login, register, etc.)
     path('accounts/', include('apps.accounts.urls')),
+
+    # Built-in auth URLs (for password reset, etc.) - but avoid conflict with login
+    path('auth/', include('django.contrib.auth.urls')),
+
     path('events/', include('apps.events.urls')),
-    path('accounts/', include('django.contrib.auth.urls')),  # ← this line gives name='login'
     path('bookings/', include('apps.bookings.urls')),
-    #path('payments/', include('apps.payments.urls')),
     path('calendar/', include('apps.calendar_view.urls')), 
     path('', include('apps.core.urls')),
 ]
 
-# Serve media files during development
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
