@@ -19,7 +19,7 @@ Please login to continue. </p>
   <form method="post" action="{% url 'accounts:login' %}">
     {% csrf_token %}
 
-```
+    
 <!-- Username -->
 <div style="margin-bottom: 1.5rem;">
   <label for="id_username" style="display: block; margin-bottom: 0.5rem; color: #ccc;">Username</label>
@@ -46,7 +46,7 @@ Please login to continue. </p>
 </button>
 
 <input type="hidden" name="next" value="{{ next }}">
-```
+
 
   </form>
 
@@ -68,5 +68,44 @@ function togglePassword(fieldId, el) {
   }
 }
 </script>
+
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+                {{ error }}<br>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="mb-3">
+        {{ form.username.label_tag }}
+        {{ form.username }}
+        {% if form.username.errors %}
+            <div class="text-danger">
+                {% for error in form.username.errors %}
+                    {{ error }}<br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="mb-3">
+        {{ form.password.label_tag }}
+        {{ form.password }}
+        {% if form.password.errors %}
+            <div class="text-danger">
+                {% for error in form.password.errors %}
+                    {{ error }}<br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <button type="submit" class="btn btn-primary">Login</button>
+</form>
 
 {% endblock %}

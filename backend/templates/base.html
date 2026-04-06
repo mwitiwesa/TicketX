@@ -154,10 +154,11 @@
     </div>
 
     <div class="user-menu">
+        
         {% if user.is_authenticated %}
-            <span>👤 {{ user.email }}</span>
+            <span>👤 {{ user.username }}</span>
 
-            {% if user.is_staff or user.is_superuser %}
+            {% if user.is_staff %}
                 <a href="{% url 'admin:index' %}" class="admin-btn">Go to Admin Panel</a>
             {% endif %}
 
@@ -169,6 +170,13 @@
         {% else %}
             <a href="{% url 'accounts:login' %}">Login</a>
         {% endif %}
+
+        <p style="color: yellow; font-size: 12px;">
+          Auth: {{ user.is_authenticated }} |
+          Staff: {{ user.is_staff }} |
+          Super: {{ user.is_superuser }} |
+          User: {{ user }}
+        </p>
     </div>
 </nav>
 
@@ -266,7 +274,7 @@
 
         <!-- Logout -->
         <div style="text-align: center; margin-top: 2rem;">
-          <a href="{% url 'logout' %}" style="color: #ff5252; font-size: 1.1rem; text-decoration: none;">
+          <a href="{% url 'accounts:logout' %}" style="color: #ff5252; font-size: 1.1rem; text-decoration: none;">
             Logout
           </a>
         </div>

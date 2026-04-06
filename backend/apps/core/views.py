@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.db.models import Q
 from apps.events.models import Event
-from apps.bookings.models import Booking  # ← THIS LINE WAS MISSING - now fixed
+from apps.bookings.models import Booking 
 from datetime import date, timedelta
 from apps.calendar_view.utils import get_calendar_data
 from django.core.paginator import Paginator

@@ -14,6 +14,16 @@ DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 # Allowed hosts - Update with your actual domain later
 ALLOWED_HOSTS = ['ticket2x.onrender.com', 'localhost', '127.0.0.1']
 
+# Session & CSRF cookies
+if not DEBUG:
+    # Production, ensure HTTPS works before enabling
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+else:
+    # Development or testing
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -97,8 +107,10 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Custom User Model
-#AUTH_USER_MODEL = 'accounts.User'
-
+AUTH_USER_MODEL = 'accounts.User'
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
 # Login / Logout redirects
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
