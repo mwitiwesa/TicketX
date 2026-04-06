@@ -1,24 +1,17 @@
-from django import forms
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from .models import User
 
-# Form for Login (uses Email instead of Username)
-class CustomAuthenticationForm(AuthenticationForm):
-    username = forms.EmailField(
-        label="Email Address",
-        widget=forms.EmailInput(attrs={
-            'autofocus': True,
+from django import forms
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.models import User
+
+class RegisterForm(UserCreationForm):
+    class Meta:
+        model = User
+        fields = ["username", "password1", "password2"]
+
+class LoginForm(AuthenticationForm):
+    username = forms.CharField(
+        widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Enter your email'
+            'placeholder': 'Enter username'
         })
     )
-
-    class Meta:
-        model = User
-        fields = ('email', 'password')
-
-
-class CustomUserCreationForm(UserCreationForm):
-    class Meta:
-        model = User
-        fields = ('email', 'password1', 'password2')
