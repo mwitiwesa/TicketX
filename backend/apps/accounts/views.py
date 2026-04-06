@@ -13,7 +13,7 @@ def register(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.role = 'CLIENT'
+            user.role = 'ADMIN'
             user.is_active = True
             user.save()
             login(request, user)
@@ -27,7 +27,7 @@ def register(request):
     return render(request, 'accounts/register.html', {'form': form})
 
 
-# Temporary debug views (you can remove these later)
+# Temporary debug views
 def debug_login(request):
     try:
         user = User.objects.get(email='admin@ticket2x.com')
