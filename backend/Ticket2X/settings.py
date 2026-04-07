@@ -2,29 +2,19 @@ import os
 from pathlib import Path
 import dj_database_url
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# ======================
+# BASE SETTINGS
+# ======================
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
-# Allowed hosts - Update with your actual domain later
-ALLOWED_HOSTS = ['ticket2x.onrender.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",")
 
-# Session & CSRF cookies
-if not DEBUG:
-    # Production, ensure HTTPS works before enabling
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-else:
-    # Development or testing
-    SESSION_COOKIE_SECURE = False
-    CSRF_COOKIE_SECURE = False
 
-# Application definition
+# APPLICATIONs
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -32,9 +22,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'whitenoise.runserver_nostatic',
 
-    # Our apps
+    # Your apps
     'apps.accounts',
     'apps.events',
     'apps.bookings',
@@ -42,19 +33,28 @@ INSTALLED_APPS = [
     'apps.core',
 ]
 
+# ======================
+# MIDDLEWARE
+# ======================
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 ROOT_URLCONF = 'Ticket2X.urls'
 
+# ======================
+# TEMPLATES
+# ======================
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -73,16 +73,41 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Ticket2X.wsgi.application'
 
-# Database configuration - PostgreSQL on Render, fallback to SQLite locally
-DATABASES = {
-    'default': dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
-}
+# ======================
+# DATABASE
+# ======================
+if os.environ.get("DATABASE_URL"):
+    DATABASES = {
+        "default": dj_database_url.parse(
+            os.environ["DATABASE_URL"],
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
-# Password validation
+# ======================
+# AUTHENTICATION
+# ======================
+AUTH_USER_MODEL = 'accounts.User'
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/accounts/login/'
+LOGIN_URL = '/accounts/login/'
+
+# ======================
+# PASSWORD VALIDATION
+# ======================
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -90,41 +115,73 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# Internationalization
+# ======================
+# INTERNATIONALIZATION
+# ======================
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Africa/Nairobi'
 USE_I18N = True
 USE_TZ = True
 
-# Static files
+# ======================
+# STATIC FILES
+# ======================
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
+
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Media files
+# ======================
+# MEDIA FILES
+# ======================
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Custom User Model
-AUTH_USER_MODEL = 'accounts.User'
-AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-]
-# Login / Logout redirects
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/accounts/login/'
-LOGIN_URL = '/accounts/login/'
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# Security settings for production
+# ======================
+# SECURITY (PRODUCTION)
+# ======================
 if not DEBUG:
-    SECURE_SSL_REDIRECT = True
+    SECURE_SSL_REDIRECT = False
+
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
+
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    CSRF_COOKIE_SAMESITE = 'Lax'
+
+
+# ======================
+# AUTO CREATE SUPERUSER (NO SHELL FIX)
+# ======================
+if os.getenv("DJANGO_SUPERUSER_EMAIL") and os.getenv("DJANGO_SUPERUSER_PASSWORD"):
+    try:
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+
+        email = os.getenv("DJANGO_SUPERUSER_EMAIL")
+        password = os.getenv("DJANGO_SUPERUSER_PASSWORD")
+
+        if not User.objects.filter(email=email).exists():
+            print("Creating superuser...")
+            User.objects.create_superuser(
+                email=email,
+                password=password,
+            )
+    except Exception as e:
+        print(f"Superuser creation skipped: {e}")
+
+# ======================
+# DEFAULT FIELD
+# ======================
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+CSRF_TRUSTED_ORIGINS = [
+    "https://ticket2x.onrender.com"
+]

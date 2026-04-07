@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth import login
 from django.contrib import messages
-from .forms import RegisterForm
+from .forms import CustomUserCreationForm
 
 
 def register(request):
@@ -9,49 +9,17 @@ def register(request):
         return redirect('core:home')
 
     if request.method == 'POST':
-        form = RegisterForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
-            user = form.save()
+            user = form.save(commit=False)
+            user.is_active = True
+            user.save()
             login(request, user)
-            messages.success(request, "Account created successfully!")
+            messages.success(request, "Registration successful! Welcome to Ticket2X.")
             return redirect('core:home')
         else:
-            messages.error(request, "Please fix the errors below.")
+            messages.error(request, "Please correct the errors below.")
     else:
-        form = RegisterForm()
+        form = CustomUserCreationForm()
 
     return render(request, 'accounts/register.html', {'form': form})
-
-
-# ✅ FIXED LOGIN VIEW
-def login_view(request):
-    if request.user.is_authenticated:
-        return redirect('core:home')
-
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-
-        user = authenticate(request, username=username, password=password)
-
-        if user is not None:
-            if user.is_active:
-                login(request, user)
-                messages.success(request, "Login successful!")
-                return redirect('core:home')
-            else:
-                messages.error(request, "Account is inactive.")
-        else:
-            messages.error(request, "Invalid username or password.")
-
-    return render(request, 'accounts/login.html')
-
-
-# ✅ PROPER LOGOUT
-def logout_view(request):
-    if request.method == 'POST':
-        logout(request)
-        messages.success(request, "Logged out successfully.")
-        return redirect('accounts:login')
-
-    return redirect('core:home')

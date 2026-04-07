@@ -272,7 +272,7 @@ def download_tickets(request, booking_id):
     buffer.close()
 
     response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="ticketx_booking_{booking.id}.pdf"'
+    response['Content-Disposition'] = f'attachment; filename="ticket2x_booking_{booking.id}.pdf"'
     response.write(pdf_content)
     return response
 

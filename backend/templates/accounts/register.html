@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Register - TicketX{% endblock %}
+{% block title %}Register - Ticket2X{% endblock %}
 
 {% block content %}
 
@@ -21,7 +21,6 @@
   <form method="post">
     {% csrf_token %}
 
-```
 <!-- Username -->
 <div style="margin-bottom: 1.5rem;">
   <label for="{{ form.username.id_for_label }}" style="display: block; margin-bottom: 0.5rem; color: #ccc;">Username</label>
@@ -67,7 +66,7 @@
   style="width: 100%; padding: 0.9rem; background: #d32f2f; color: white; border: none; border-radius: 6px; font-size: 1.05rem; cursor: pointer;">
   Register
 </button>
-```
+
 
   </form>
 
