@@ -11,10 +11,11 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 
 DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",")
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "ticket2x.onrender.com").split(",")
 
-
-# APPLICATIONs
+# ======================
+# APPLICATIONS
+# ======================
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -25,7 +26,7 @@ INSTALLED_APPS = [
 
     'whitenoise.runserver_nostatic',
 
-    # Your apps
+    # Local apps
     'apps.accounts',
     'apps.events',
     'apps.bookings',
@@ -39,18 +40,16 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
-
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 ROOT_URLCONF = 'Ticket2X.urls'
+WSGI_APPLICATION = 'Ticket2X.wsgi.application'
 
 # ======================
 # TEMPLATES
@@ -71,24 +70,24 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'Ticket2X.wsgi.application'
-
 # ======================
-# DATABASE
+# DATABASE CONFIGURATION (Fixed for Render)
 # ======================
 if os.environ.get("DATABASE_URL"):
     DATABASES = {
-        "default": dj_database_url.parse(
+        'default': dj_database_url.parse(
             os.environ["DATABASE_URL"],
             conn_max_age=600,
             conn_health_checks=True,
+            ssl_require=True,          # Important for Render Postgres
         )
     }
 else:
+    # Fallback for local development
     DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
 
@@ -96,10 +95,6 @@ else:
 # AUTHENTICATION
 # ======================
 AUTH_USER_MODEL = 'accounts.User'
-
-AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-]
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
@@ -124,7 +119,7 @@ USE_I18N = True
 USE_TZ = True
 
 # ======================
-# STATIC FILES
+# STATIC & MEDIA FILES
 # ======================
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
@@ -132,18 +127,14 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# ======================
-# MEDIA FILES
-# ======================
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # ======================
-# SECURITY (PRODUCTION)
+# SECURITY & PRODUCTION SETTINGS
 # ======================
 if not DEBUG:
     SECURE_SSL_REDIRECT = False
-
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 
@@ -154,18 +145,25 @@ if not DEBUG:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
     SESSION_COOKIE_SAMESITE = 'Lax'
     CSRF_COOKIE_SAMESITE = 'Lax'
 
+# ======================
+# CSRF Trusted Origins
+# ======================
+CSRF_TRUSTED_ORIGINS = [
+    'https://ticket2x.onrender.com',
+    'https://*.onrender.com',
+]
 
 # ======================
-# AUTO CREATE SUPERUSER (NO SHELL FIX)
+# AUTO CREATE SUPERUSER (Development Helper)
 # ======================
-if os.getenv("DJANGO_SUPERUSER_EMAIL") and os.getenv("DJANGO_SUPERUSER_PASSWORD"):
+if os.getenv("DJANGO_SUPERUSER_EMAIL") and os.getenv("DJANGO_SUPERUSER_PASSWORD") and DEBUG:
     try:
         from django.contrib.auth import get_user_model
         User = get_user_model()
-
         email = os.getenv("DJANGO_SUPERUSER_EMAIL")
         password = os.getenv("DJANGO_SUPERUSER_PASSWORD")
 
@@ -182,6 +180,3 @@ if os.getenv("DJANGO_SUPERUSER_EMAIL") and os.getenv("DJANGO_SUPERUSER_PASSWORD"
 # DEFAULT FIELD
 # ======================
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-CSRF_TRUSTED_ORIGINS = [
-    "https://ticket2x.onrender.com"
-]

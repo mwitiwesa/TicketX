@@ -4,63 +4,62 @@
 
 {% block content %}
 
-<div style="max-width: 420px; margin: 4rem auto; padding: 2rem; background: rgba(30, 30, 40, 0.9); border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); color: #eee;">
+<div class="login-container">
+    <h2>Login to Ticket2X</h2>
 
-  <h2 style="text-align: center; margin-bottom: 1.8rem; color: #ff5252;">
-    Login to Ticket2X
-  </h2>
+    {% if form.errors %}
+        <p class="error-message">
+            Invalid username or password.
+        </p>
+    {% endif %}
 
-  {% if form.errors %}
-    <p style="color: #ff6666; text-align: center;">
-      Invalid username or password.
+    {% if next %}
+        <p class="warning-message">
+            Please login to continue.
+        </p>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+
+        <!-- Username -->
+        <div class="form-group">
+            <label for="{{ form.username.id_for_label }}">Username</label>
+            {{ form.username }}
+        </div>
+
+        <!-- Password -->
+        <div class="form-group password-group">
+            <label for="{{ form.password.id_for_label }}">Password</label>
+            <div class="password-wrapper">
+                {{ form.password }}
+                <span onclick="togglePassword()" class="toggle-password">👁️</span>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-login">Login</button>
+
+        <input type="hidden" name="next" value="{{ next }}">
+    </form>
+
+    <p class="register-link">
+        Don't have an account? 
+        <a href="{% url 'accounts:register' %}">Register</a>
     </p>
-  {% endif %}
-
-  {% if next %}
-    <p style="color: #ffcc00; text-align: center;">
-      Please login to continue.
-    </p>
-  {% endif %}
-
-  <form method="post">
-    {% csrf_token %}
-
-    <!-- Username -->
-    <div style="margin-bottom: 1.5rem;">
-      <label style="color:#ccc;">Username</label>
-      {{ form.username }}
-    </div>
-
-    <!-- Password -->
-    <div style="margin-bottom: 1.8rem; position: relative;">
-      <label style="color:#ccc;">Password</label>
-      {{ form.password }}
-
-      <span onclick="togglePassword()" 
-        style="position:absolute; right:10px; top:38px; cursor:pointer;">
-        👁️
-      </span>
-    </div>
-
-    <button type="submit"
-      style="width: 100%; padding: 0.9rem; background: #d32f2f; color: white; border: none; border-radius: 6px;">
-      Login
-    </button>
-
-    <input type="hidden" name="next" value="{{ next }}">
-  </form>
-
-  <p style="text-align: center; margin-top: 1.5rem; color: #aaa;">
-    Don't have an account?
-    <a href="{% url 'accounts:register' %}" style="color: #ff9999;">Register</a>
-  </p>
-
 </div>
 
 <script>
 function togglePassword() {
-  const input = document.getElementById("id_password");
-  input.type = input.type === "password" ? "text" : "password";
+    const passwordInput = document.getElementById("{{ form.password.id_for_label }}");
+    const toggleIcon = document.querySelector('.toggle-password');
+    
+    if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        toggleIcon.textContent = "🙈";
+    } else {
+        passwordInput.type = "password";
+        toggleIcon.textContent = "👁️";
+    }
 }
 </script>
 
