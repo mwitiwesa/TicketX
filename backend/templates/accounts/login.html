@@ -3,53 +3,52 @@
 {% block title %}Login - Ticket2X{% endblock %}
 
 {% block content %}
-
-<div class="login-container">
-    <h2>Login to Ticket2X</h2>
+  <div style="max-width: 420px; margin: 4rem auto; padding: 2rem; 
+              background: rgba(30, 30, 40, 0.95); border-radius: 16px; 
+              box-shadow: 0 8px 30px rgba(0,0,0,0.6); color: #eee;">
+    
+    <h2 style="text-align: center; margin-bottom: 1.8rem; color: #ff5252;">
+      Login to Ticket2X
+    </h2>
 
     {% if form.errors %}
-        <p class="error-message">Invalid username or password. Please try again.</p>
+      <p style="color: #ff6666; text-align: center; margin-bottom: 1rem;">
+        Invalid username or password. Please try again.
+      </p>
     {% endif %}
 
-    <form method="post">
-        {% csrf_token %}
+    <form method="post" action="{% url 'accounts:login' %}">
+      {% csrf_token %}
 
-        <div class="form-group">
-            <label for="{{ form.username.id_for_label }}">Username</label>
-            {{ form.username }}
-        </div>
+      <div style="margin-bottom: 1.5rem;">
+        <label style="display: block; margin-bottom: 0.5rem; color: #ccc;">Username</label>
+        {{ form.username }}
+      </div>
 
-        <div class="form-group password-group">
-            <label for="{{ form.password.id_for_label }}">Password</label>
-            <div class="password-wrapper">
-                {{ form.password }}
-                <span onclick="togglePassword()" class="toggle-password">👁️</span>
-            </div>
-        </div>
+      <div style="margin-bottom: 1.8rem; position: relative;">
+        <label style="display: block; margin-bottom: 0.5rem; color: #ccc;">Password</label>
+        {{ form.password }}
+        <span onclick="togglePassword()" style="position: absolute; right: 12px; top: 38px; cursor: pointer; color: #aaa;">👁️</span>
+      </div>
 
-        <button type="submit" class="btn-login">Login</button>
-        <input type="hidden" name="next" value="{{ next }}">
+      <button type="submit" style="width: 100%; padding: 0.9rem; background: #d32f2f; color: white; border: none; border-radius: 8px; font-size: 1.05rem; cursor: pointer;">
+        Login
+      </button>
     </form>
 
-    <p style="text-align: center; margin-top: 1.5rem; color: #aaa;">
-        Don't have an account? 
-        <a href="{% url 'accounts:register' %}" style="color: #ff9999;">Register</a>
+    <p style="text-align: center; margin-top: 1.8rem; color: #aaa;">
+      Don't have an account? <a href="{% url 'accounts:register' %}" style="color: #ff9999;">Register</a>
     </p>
-</div>
+  </div>
 
-<script>
-function togglePassword() {
-    const passwordInput = document.getElementById("{{ form.password.id_for_label }}");
-    const toggleIcon = document.querySelector('.toggle-password');
-    
-    if (passwordInput.type === "password") {
-        passwordInput.type = "text";
-        toggleIcon.textContent = "🙈";
-    } else {
-        passwordInput.type = "password";
-        toggleIcon.textContent = "👁️";
+  <script>
+    function togglePassword() {
+      const pwd = document.getElementById('id_password');
+      if (pwd.type === "password") {
+        pwd.type = "text";
+      } else {
+        pwd.type = "password";
+      }
     }
-}
-</script>
-
+  </script>
 {% endblock %}

@@ -8,24 +8,67 @@
         :root {
             --primary-red: #ff5252;
             --dark-bg: #0f0f1a;
+            --nav-bg: #111;
         }
-        body { margin: 0; font-family: Arial, sans-serif; background: var(--dark-bg); color: #eee; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: var(--dark-bg);
+            color: #eee;
+            min-height: 100vh;
+        }
         .navbar {
-            background: #111; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100;
+            background: var(--nav-bg);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
-        .logo { color: var(--primary-red); font-size: 1.8rem; font-weight: bold; }
-        .nav-links a { color: #ccc; margin-left: 1.5rem; text-decoration: none; }
+        .logo {
+            color: var(--primary-red);
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .nav-links a {
+            color: #ccc;
+            margin-left: 1.5rem;
+            text-decoration: none;
+        }
         .nav-links a:hover { color: white; }
-        .hamburger { font-size: 1.8rem; cursor: pointer; display: none; color: white; }
+        .hamburger {
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: white;
+            display: none;
+        }
 
         /* Side Menu */
         .side-menu {
-            position: fixed; top: 0; right: -350px; width: 320px; height: 100%; background: #1a1a2e; 
-            transition: right 0.4s ease; padding: 2rem; box-shadow: -5px 0 15px rgba(0,0,0,0.5); z-index: 200;
+            position: fixed;
+            top: 0;
+            right: -350px;
+            width: 320px;
+            height: 100%;
+            background: #1a1a2e;
+            transition: right 0.4s ease;
+            padding: 2rem 1.5rem;
+            box-shadow: -5px 0 20px rgba(0,0,0,0.6);
+            z-index: 2000;
         }
         .side-menu.open { right: 0; }
-        .side-menu a { display: block; padding: 1rem; color: #ddd; text-decoration: none; border-bottom: 1px solid #333; }
-        .side-menu a:hover { background: #2a2a40; color: white; }
+        .side-menu a {
+            display: block;
+            padding: 1rem 0;
+            color: #ddd;
+            text-decoration: none;
+            border-bottom: 1px solid #333;
+        }
+        .side-menu a:hover { color: var(--primary-red); background: #2a2a40; }
 
         @media (max-width: 768px) {
             .nav-links { display: none; }
@@ -36,7 +79,8 @@
 <body>
 
     <nav class="navbar">
-        <div class="logo">Ticket2X</div>
+        <a href="/" class="logo">Ticket2X</a>
+        
         <div class="nav-links">
             {% if user.is_authenticated %}
                 <a href="/">Home</a>
@@ -46,37 +90,44 @@
                 <a href="{% url 'accounts:register' %}">Register</a>
             {% endif %}
         </div>
-        <div class="hamburger" id="menu-toggle">☰</div>
+
+        <div class="hamburger" id="hamburger">☰</div>
     </nav>
 
     <!-- Side Menu -->
     <div class="side-menu" id="side-menu">
-        <h2 style="color: #ff5252;">Menu</h2>
+        <h2 style="color: var(--primary-red); margin-bottom: 1.5rem;">Menu</h2>
         {% if user.is_authenticated %}
-            <a href="/">Home</a>
-            <a href="/bookings/my-tickets/">Your Tickets</a>
-            <a href="{% url 'accounts:logout' %}">Logout</a>
+            <a href="/">🏠 Home</a>
+            <a href="/bookings/my-tickets/">🎟️ Your Tickets</a>
+            <a href="{% url 'accounts:logout' %}">🚪 Logout</a>
         {% else %}
-            <a href="{% url 'accounts:login' %}">Login</a>
-            <a href="{% url 'accounts:register' %}">Register</a>
+            <a href="{% url 'accounts:login' %}">🔑 Login</a>
+            <a href="{% url 'accounts:register' %}">📝 Register</a>
         {% endif %}
     </div>
 
-    <div style="padding: 2rem;">
+    <div style="padding: 2rem 1rem; max-width: 1200px; margin: 0 auto;">
         {% block content %}{% endblock %}
     </div>
 
     <script>
-        const toggle = document.getElementById('menu-toggle');
-        const menu = document.getElementById('side-menu');
-        toggle.addEventListener('click', () => {
-            menu.classList.toggle('open');
+        const hamburger = document.getElementById('hamburger');
+        const sideMenu = document.getElementById('side-menu');
+
+        hamburger.addEventListener('click', function(e) {
+            e.stopPropagation();
+            sideMenu.classList.toggle('open');
         });
-        // Close when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!menu.contains(e.target) && e.target !== toggle) {
-                menu.classList.remove('open');
+
+        document.addEventListener('click', function(e) {
+            if (!sideMenu.contains(e.target) && e.target !== hamburger) {
+                sideMenu.classList.remove('open');
             }
+        });
+
+        sideMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => sideMenu.classList.remove('open'));
         });
     </script>
 
