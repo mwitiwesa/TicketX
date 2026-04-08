@@ -3,90 +3,93 @@
 {% block title %}Register - Ticket2X{% endblock %}
 
 {% block content %}
+  <div style="max-width: 460px; margin: 5rem auto; padding: 2.5rem; 
+              background: rgba(30, 30, 40, 0.95); border-radius: 16px; 
+              box-shadow: 0 10px 40px rgba(0,0,0,0.6); color: #eee;">
 
-<div style="max-width: 420px; margin: 4rem auto; padding: 2rem; background: rgba(30, 30, 40, 0.9); border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); color: #eee;">
+    <h2 style="text-align: center; margin-bottom: 2rem; color: #ff5252;">
+      Create an Account
+    </h2>
 
-  <h2 style="text-align: center; margin-bottom: 1.8rem; color: #ff5252;">Create an Account</h2>
+    {% if form.non_field_errors %}
+      <div style="padding: 0.8rem; border-radius: 6px; background: #c62828; color: white; text-align: center; margin-bottom: 1.5rem;">
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
 
-{% if form.non_field_errors %} <div style="padding: 0.8rem; border-radius: 6px; background: #c62828; color: white; text-align: center; margin-bottom:1rem;">
-{{ form.non_field_errors }} </div>
-{% endif %}
+    {% if messages %}
+      {% for message in messages %}
+        <div style="padding: 0.8rem; border-radius: 6px; text-align: center; margin-bottom: 1rem; background: {% if message.tags == 'success' %}#2e7d32{% else %}#c62828{% endif %}; color: white;">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
 
-{% if messages %}
-{% for message in messages %} <div style="padding: 0.8rem; border-radius: 6px; text-align: center; margin-bottom:1rem;">
-{{ message }} </div>
-{% endfor %}
-{% endif %}
+    <form method="post">
+      {% csrf_token %}
 
-  <form method="post">
-    {% csrf_token %}
+      <!-- Email Field - Bigger -->
+      <div style="margin-bottom: 1.8rem;">
+        <label style="display: block; margin-bottom: 0.6rem; color: #ccc; font-size: 1.1rem;">Email Address</label>
+        {{ form.email }}
+        {% if form.email.errors %}
+          <div style="color: #ff6666; font-size: 0.9rem;">{{ form.email.errors }}</div>
+        {% endif %}
+      </div>
 
-<!-- Username -->
-<div style="margin-bottom: 1.5rem;">
-  <label for="{{ form.username.id_for_label }}" style="display: block; margin-bottom: 0.5rem; color: #ccc;">Username</label>
-  {{ form.username }}
-  {% if form.username.errors %}
-    <div style="color:#ff6666; font-size: 0.85rem;">
-      {{ form.username.errors }}
-    </div>
-  {% endif %}
-</div>
+      <!-- Password Field - Bigger with Eye -->
+      <div style="margin-bottom: 1.8rem; position: relative;">
+        <label style="display: block; margin-bottom: 0.6rem; color: #ccc; font-size: 1.1rem;">Password</label>
+        <input type="password" name="password1" id="id_password1" required
+               style="width: 100%; padding: 16px 50px 16px 16px; font-size: 1.15rem; 
+                      border-radius: 10px; border: 1px solid #444; background: #222; color: #eee;">
+        <span onclick="togglePassword('id_password1', this)" 
+              style="position: absolute; right: 18px; top: 48px; cursor: pointer; color: #aaa; font-size: 1.4rem;">
+          👁️
+        </span>
+        {% if form.password1.errors %}
+          <div style="color: #ff6666; font-size: 0.9rem;">{{ form.password1.errors }}</div>
+        {% endif %}
+      </div>
 
-<!-- Password -->
-<div style="margin-bottom: 1.5rem; position: relative;">
-  <label for="{{ form.password1.id_for_label }}" style="display: block; margin-bottom: 0.5rem; color: #ccc;">Password</label>
-  {{ form.password1 }}
-  <span onclick="togglePassword('{{ form.password1.id_for_label }}', this)"
-    style="position:absolute; right:10px; top:38px; cursor:pointer; color:#aaa;">
-    👁️
-  </span>
-  {% if form.password1.errors %}
-    <div style="color:#ff6666; font-size: 0.85rem;">
-      {{ form.password1.errors }}
-    </div>
-  {% endif %}
-</div>
+      <!-- Confirm Password Field - Bigger with Eye -->
+      <div style="margin-bottom: 2rem; position: relative;">
+        <label style="display: block; margin-bottom: 0.6rem; color: #ccc; font-size: 1.1rem;">Confirm Password</label>
+        <input type="password" name="password2" id="id_password2" required
+               style="width: 100%; padding: 16px 50px 16px 16px; font-size: 1.15rem; 
+                      border-radius: 10px; border: 1px solid #444; background: #222; color: #eee;">
+        <span onclick="togglePassword('id_password2', this)" 
+              style="position: absolute; right: 18px; top: 48px; cursor: pointer; color: #aaa; font-size: 1.4rem;">
+          👁️
+        </span>
+        {% if form.password2.errors %}
+          <div style="color: #ff6666; font-size: 0.9rem;">{{ form.password2.errors }}</div>
+        {% endif %}
+      </div>
 
-<!-- Confirm Password -->
-<div style="margin-bottom: 1.8rem; position: relative;">
-  <label for="{{ form.password2.id_for_label }}" style="display: block; margin-bottom: 0.5rem; color: #ccc;">Confirm Password</label>
-  {{ form.password2 }}
-  <span onclick="togglePassword('{{ form.password2.id_for_label }}', this)"
-    style="position:absolute; right:10px; top:38px; cursor:pointer; color:#aaa;">
-    👁️
-  </span>
-  {% if form.password2.errors %}
-    <div style="color:#ff6666; font-size: 0.85rem;">
-      {{ form.password2.errors }}
-    </div>
-  {% endif %}
-</div>
+      <button type="submit" 
+              style="width: 100%; padding: 16px; background: #d32f2f; color: white; 
+                     border: none; border-radius: 10px; font-size: 1.2rem; font-weight: bold; cursor: pointer;">
+        Register
+      </button>
+    </form>
 
-<button type="submit"
-  style="width: 100%; padding: 0.9rem; background: #d32f2f; color: white; border: none; border-radius: 6px; font-size: 1.05rem; cursor: pointer;">
-  Register
-</button>
+    <p style="text-align: center; margin-top: 2rem; color: #aaa; font-size: 1.05rem;">
+      Already have an account? 
+      <a href="{% url 'accounts:login' %}" style="color: #ff9999;">Login here</a>
+    </p>
+  </div>
 
-
-  </form>
-
-  <p style="text-align: center; margin-top: 1.5rem; color: #aaa;">
-    Already have an account? 
-    <a href="{% url 'accounts:login' %}" style="color: #ff9999;">Login</a>
-  </p>
-</div>
-
-<script>
-function togglePassword(fieldId, el) {
-  const input = document.getElementById(fieldId);
-  if (input.type === "password") {
-    input.type = "text";
-    el.textContent = "🙈";
-  } else {
-    input.type = "password";
-    el.textContent = "👁️";
-  }
-}
-</script>
-
+  <script>
+    function togglePassword(fieldId, el) {
+      const input = document.getElementById(fieldId);
+      if (input.type === "password") {
+        input.type = "text";
+        el.textContent = "🙈";
+      } else {
+        input.type = "password";
+        el.textContent = "👁️";
+      }
+    }
+  </script>
 {% endblock %}

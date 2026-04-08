@@ -5,8 +5,13 @@ from .models import User
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = User
-        fields = ('username', 'email', 'password1', 'password2')
-
+        fields = ('email', 'password1', 'password2')
 
 class CustomAuthenticationForm(AuthenticationForm):
-    username = forms.CharField(label="Username")
+    username = forms.EmailField(
+        label="Email Address",
+        widget=forms.EmailInput(attrs={
+            'autofocus': True,
+            'placeholder': 'Enter your email'
+        })
+    )

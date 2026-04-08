@@ -1,139 +1,64 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Ticket2X{% endblock %}</title>
-    <style>
-        :root {
-            --primary-red: #ff5252;
-            --dark-bg: #0f0f1a;
-            --nav-bg: #111;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: Arial, sans-serif;
-            background: var(--dark-bg);
-            color: #eee;
-            min-height: 100vh;
-        }
-        .navbar {
-            background: var(--nav-bg);
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-        }
-        .logo {
-            color: var(--primary-red);
-            font-size: 1.9rem;
-            font-weight: bold;
-            text-decoration: none;
-        }
-        .nav-links a {
-            color: #ccc;
-            margin-left: 1.8rem;
-            text-decoration: none;
-            font-size: 1.05rem;
-        }
-        .nav-links a:hover { color: white; }
+{% extends 'base.html' %}
 
-        .hamburger {
-            font-size: 1.9rem;
-            cursor: pointer;
-            color: white;
-            display: none;
-        }
+{% block title %}Login - Ticket2X{% endblock %}
 
-        /* Side Menu */
-        .side-menu {
-            position: fixed;
-            top: 0;
-            right: -350px;
-            width: 320px;
-            height: 100%;
-            background: #1a1a2e;
-            transition: right 0.4s ease;
-            padding: 2.5rem 1.5rem;
-            box-shadow: -5px 0 25px rgba(0,0,0,0.7);
-            z-index: 2000;
-        }
-        .side-menu.open { right: 0; }
-        .side-menu a {
-            display: block;
-            padding: 1.1rem 0;
-            color: #ddd;
-            text-decoration: none;
-            border-bottom: 1px solid #333;
-            font-size: 1.1rem;
-        }
-        .side-menu a:hover { color: var(--primary-red); background: #2a2a40; }
+{% block content %}
+  <div style="max-width: 460px; margin: 5rem auto; padding: 2.5rem; 
+              background: rgba(30, 30, 40, 0.95); border-radius: 16px; 
+              box-shadow: 0 10px 40px rgba(0,0,0,0.6); color: #eee;">
 
-        @media (max-width: 768px) {
-            .nav-links { display: none; }
-            .hamburger { display: block; }
-        }
-    </style>
-</head>
-<body>
+    <h2 style="text-align: center; margin-bottom: 2rem; color: #ff5252;">
+      Login to Ticket2X
+    </h2>
 
-    <nav class="navbar">
-        <a href="/" class="logo">Ticket2X</a>
-        
-        <div class="nav-links">
-            {% if user.is_authenticated %}
-                <a href="/">Home</a>
-                <a href="{% url 'accounts:logout' %}">Logout</a>
-            {% else %}
-                <a href="{% url 'accounts:login' %}">Login</a>
-                <a href="{% url 'accounts:register' %}">Register</a>
-            {% endif %}
-        </div>
+    {% if form.errors %}
+      <p style="color: #ff6666; text-align: center; margin-bottom: 1.5rem; font-size: 1.05rem;">
+        Invalid email or password. Please try again.
+      </p>
+    {% endif %}
 
-        <div class="hamburger" id="hamburger">☰</div>
-    </nav>
+    <form method="post" action="{% url 'accounts:login' %}">
+      {% csrf_token %}
 
-    <!-- Side Menu -->
-    <div class="side-menu" id="side-menu">
-        <h2 style="color: var(--primary-red); margin-bottom: 2rem;">Menu</h2>
-        {% if user.is_authenticated %}
-            <a href="/">🏠 Home</a>
-            <a href="/bookings/my-tickets/">🎟️ Your Tickets</a>
-            <a href="{% url 'accounts:logout' %}">🚪 Logout</a>
-        {% else %}
-            <a href="{% url 'accounts:login' %}">🔑 Login</a>
-            <a href="{% url 'accounts:register' %}">📝 Register</a>
-        {% endif %}
-    </div>
+      <!-- Email Field - Bigger -->
+      <div style="margin-bottom: 1.8rem;">
+        <label style="display: block; margin-bottom: 0.6rem; color: #ccc; font-size: 1.1rem;">Email Address</label>
+        {{ form.username }}
+      </div>
 
-    <div style="padding: 2rem 1rem; max-width: 1280px; margin: 0 auto;">
-        {% block content %}{% endblock %}
-    </div>
+      <!-- Password Field - Bigger with Eye Icon Inside -->
+      <div style="margin-bottom: 2.2rem; position: relative;">
+        <label style="display: block; margin-bottom: 0.6rem; color: #ccc; font-size: 1.1rem;">Password</label>
+        <input type="password" name="password" id="id_password" required
+               style="width: 100%; padding: 16px 50px 16px 16px; font-size: 1.15rem; 
+                      border-radius: 10px; border: 1px solid #444; background: #222; color: #eee;">
+        <span onclick="togglePassword()" 
+              style="position: absolute; right: 18px; top: 48px; cursor: pointer; color: #aaa; font-size: 1.4rem;">
+          👁️
+        </span>
+      </div>
 
-    <script>
-        const hamburger = document.getElementById('hamburger');
-        const sideMenu = document.getElementById('side-menu');
+      <button type="submit" 
+              style="width: 100%; padding: 16px; background: #d32f2f; color: white; 
+                     border: none; border-radius: 10px; font-size: 1.2rem; font-weight: bold; cursor: pointer;">
+        Login
+      </button>
+    </form>
 
-        hamburger.addEventListener('click', function(e) {
-            e.stopPropagation();
-            sideMenu.classList.toggle('open');
-        });
+    <p style="text-align: center; margin-top: 2rem; color: #aaa; font-size: 1.05rem;">
+      Don't have an account? 
+      <a href="{% url 'accounts:register' %}" style="color: #ff9999;">Register here</a>
+    </p>
+  </div>
 
-        document.addEventListener('click', function(e) {
-            if (!sideMenu.contains(e.target) && e.target !== hamburger) {
-                sideMenu.classList.remove('open');
-            }
-        });
-
-        sideMenu.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => sideMenu.classList.remove('open'));
-        });
-    </script>
-
-    {% block extra_js %}{% endblock %}
-</body>
-</html>
+  <script>
+    function togglePassword() {
+      const pwd = document.getElementById('id_password');
+      if (pwd.type === "password") {
+        pwd.type = "text";
+      } else {
+        pwd.type = "password";
+      }
+    }
+  </script>
+{% endblock %}

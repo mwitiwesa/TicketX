@@ -73,17 +73,19 @@ TEMPLATES = [
 # ======================
 # DATABASE CONFIGURATION (Fixed for Render)
 # ======================
-if os.environ.get("DATABASE_URL"):
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+if DATABASE_URL:
     DATABASES = {
         'default': dj_database_url.parse(
-            os.environ["DATABASE_URL"],
+            DATABASE_URL,
             conn_max_age=600,
             conn_health_checks=True,
-            ssl_require=True,          # Important for Render Postgres
+            ssl_require=True,          # Important for Render
         )
     }
 else:
-    # Fallback for local development
+    # Local development fallback
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
