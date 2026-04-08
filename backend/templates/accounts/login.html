@@ -30,7 +30,7 @@
       <div style="margin-bottom: 2.2rem; position: relative;">
         <label style="display: block; margin-bottom: 0.6rem; color: #ccc; font-size: 1.1rem;">Password</label>
         {{ form.password }}
-        <span onclick="togglePassword()" 
+        <span onclick="togglePassword('id_password', this)" 
               style="position: absolute; right: 18px; top: 48px; cursor: pointer; color: #aaa; font-size: 1.4rem;">
           👁️
         </span>
@@ -50,12 +50,15 @@
   </div>
 
   <script>
-    function togglePassword() {
-      const pwd = document.getElementById('id_password');
+    function togglePassword(fieldId, el) {
+      const pwd = document.getElementById(fieldId);
+      if (!pwd) return;
       if (pwd.type === "password") {
         pwd.type = "text";
+        el.textContent = "🙈";
       } else {
         pwd.type = "password";
+        el.textContent = "👁️";
       }
     }
   </script>

@@ -40,9 +40,7 @@
       <!-- Password Field - Bigger with Eye -->
       <div style="margin-bottom: 1.8rem; position: relative;">
         <label style="display: block; margin-bottom: 0.6rem; color: #ccc; font-size: 1.1rem;">Password</label>
-        <input type="password" name="password1" id="id_password1" required
-               style="width: 100%; padding: 16px 50px 16px 16px; font-size: 1.15rem; 
-                      border-radius: 10px; border: 1px solid #444; background: #222; color: #eee;">
+        {{ form.password1 }}
         <span onclick="togglePassword('id_password1', this)" 
               style="position: absolute; right: 18px; top: 48px; cursor: pointer; color: #aaa; font-size: 1.4rem;">
           👁️
@@ -55,9 +53,7 @@
       <!-- Confirm Password Field - Bigger with Eye -->
       <div style="margin-bottom: 2rem; position: relative;">
         <label style="display: block; margin-bottom: 0.6rem; color: #ccc; font-size: 1.1rem;">Confirm Password</label>
-        <input type="password" name="password2" id="id_password2" required
-               style="width: 100%; padding: 16px 50px 16px 16px; font-size: 1.15rem; 
-                      border-radius: 10px; border: 1px solid #444; background: #222; color: #eee;">
+        {{ form.password2 }}
         <span onclick="togglePassword('id_password2', this)" 
               style="position: absolute; right: 18px; top: 48px; cursor: pointer; color: #aaa; font-size: 1.4rem;">
           👁️
@@ -83,6 +79,7 @@
   <script>
     function togglePassword(fieldId, el) {
       const input = document.getElementById(fieldId);
+      if (!input) return;
       if (input.type === "password") {
         input.type = "text";
         el.textContent = "🙈";
