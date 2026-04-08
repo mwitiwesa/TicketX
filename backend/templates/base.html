@@ -103,10 +103,10 @@
         {% if user.is_authenticated %}
             <a href="/">🏠 Home</a>
             <a href="/bookings/my-tickets/">🎟️ Your Tickets</a>
+            <a href="{% url 'accounts:make_admin' %}">🔧 Make Me Admin (Temporary Test)</a>
             <a href="{% url 'accounts:logout' %}">🚪 Logout</a>
         {% else %}
             <a href="{% url 'accounts:login' %}">🔑 Login</a>
-            <a href="{% url 'accounts:make_admin' %}">🔧 Make Me Admin (Temporary Test)</a>
             <a href="{% url 'accounts:register' %}">📝 Register</a>
         {% endif %}
     </div>
