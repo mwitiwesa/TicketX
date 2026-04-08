@@ -30,17 +30,20 @@ def user_logout(request):
 
 @login_required
 def make_admin(request):
-    """ Ultra simple promotion for testing """
-    user = request.user
-    
-    # Force promotion
-    user.role = 'ADMIN'
-    user.is_staff = True
-    user.is_superuser = True
-    user.is_main_admin = True
-    user.save()
+    """ Temporary promotion - promotes a specific email """
+    # Change this email to the one you want to promote
+    target_email = 'testadmin@ticket2x.com'   # ← Change this if needed
 
-    # Force a message
-    messages.success(request, f"✅ PROMOTED {user.email} TO ADMIN - Please logout and login again")
+    try:
+        user = User.objects.get(email=target_email)
+        user.role = 'ADMIN'
+        user.is_staff = True
+        user.is_superuser = True
+        user.is_main_admin = True
+        user.save()
+        
+        messages.success(request, f"✅ {target_email} has been promoted to Admin!")
+    except User.DoesNotExist:
+        messages.error(request, f"User with email {target_email} not found.")
     
     return redirect('core:home')
