@@ -11,6 +11,10 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 
 DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
+# When running behind Render or another HTTPS reverse proxy,
+# this lets Django understand the original request scheme.
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "ticket2x.onrender.com").split(",")
 
 # ======================
@@ -27,7 +31,7 @@ INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
 
     # Local apps
-    'apps.accounts',
+    'apps.accounts.apps.AccountsConfig',
     'apps.events',
     'apps.bookings',
     'apps.calendar_view',

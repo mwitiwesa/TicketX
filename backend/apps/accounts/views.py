@@ -11,7 +11,8 @@ def register(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)
+            # FIX: Explicitly specify the backend
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             messages.success(request, "Registration successful! Welcome to Ticket2X.")
             return redirect('core:home')
         else:
