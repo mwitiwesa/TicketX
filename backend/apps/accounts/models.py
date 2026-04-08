@@ -37,9 +37,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(_('email address'), unique=True)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='CLIENT')
     is_main_admin = models.BooleanField(default=False)
-    created_by = models.ForeignKey(
-        'self', null=True, blank=True, on_delete=models.SET_NULL, related_name='created_admins'
-    )
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
