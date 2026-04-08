@@ -30,16 +30,17 @@ def user_logout(request):
 
 @login_required
 def make_admin(request):
-    """ Temporary function to promote the currently logged-in user to admin """
+    """ Ultra simple promotion for testing """
     user = request.user
     
-    print(f"DEBUG: Promoting user {user.email} - Current role: {user.role}")  # This will show in Render Logs
-
+    # Force promotion
     user.role = 'ADMIN'
     user.is_staff = True
     user.is_superuser = True
     user.is_main_admin = True
     user.save()
 
-    messages.success(request, f"✅ Successfully promoted {user.email} to Admin!")
+    # Force a message
+    messages.success(request, f"✅ PROMOTED {user.email} TO ADMIN - Please logout and login again")
+    
     return redirect('core:home')
