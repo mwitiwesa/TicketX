@@ -29,9 +29,7 @@
       <!-- Password Field - Bigger with Eye Icon Inside -->
       <div style="margin-bottom: 2.2rem; position: relative;">
         <label style="display: block; margin-bottom: 0.6rem; color: #ccc; font-size: 1.1rem;">Password</label>
-        <input type="password" name="password" id="id_password" required
-               style="width: 100%; padding: 16px 50px 16px 16px; font-size: 1.15rem; 
-                      border-radius: 10px; border: 1px solid #444; background: #222; color: #eee;">
+        {{ form.password }}
         <span onclick="togglePassword()" 
               style="position: absolute; right: 18px; top: 48px; cursor: pointer; color: #aaa; font-size: 1.4rem;">
           👁️

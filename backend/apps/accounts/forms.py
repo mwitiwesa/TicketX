@@ -16,7 +16,3 @@ class CustomAuthenticationForm(AuthenticationForm):
             'class': 'form-control'   # optional for styling
         })
     )
-
-    def clean_username(self):
-        #  return the email as username for the backend
-        return self.cleaned_data.get('username')
