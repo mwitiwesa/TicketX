@@ -12,6 +12,11 @@ class CustomAuthenticationForm(AuthenticationForm):
         label="Email Address",
         widget=forms.EmailInput(attrs={
             'autofocus': True,
-            'placeholder': 'Enter your email'
+            'placeholder': 'Enter your email address',
+            'class': 'form-control'   # optional for styling
         })
     )
+
+    def clean_username(self):
+        #  return the email as username for the backend
+        return self.cleaned_data.get('username')
