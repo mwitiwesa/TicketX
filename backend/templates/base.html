@@ -21,17 +21,17 @@
             flex-direction: column;
         }
 
-        /* Full Page Background - Correct path from root */
+        /* Background Image */
         body {
             background: linear-gradient(rgba(15, 15, 26, 0.90), rgba(15, 15, 26, 0.90)), 
                         url('/static/img/background.jpg') center/cover no-repeat fixed;
         }
 
-        /* Smaller Hero Header */
+        /* Hero Header */
         .hero-header {
             background: linear-gradient(rgba(0, 0, 0, 0.78), rgba(0, 0, 0, 0.78)), 
                         url('/static/img/background.jpg') center/cover no-repeat;
-            height: 200px;
+            height: 240px;
             position: relative;
         }
 
@@ -48,13 +48,25 @@
             z-index: 10;
         }
 
-        .nav-links a {
-            color: #ccc;
-            text-decoration: none;
-            font-size: 1.05rem;
-            margin-right: 1.8rem;
+        /* Search Bar in Navbar */
+        .search-bar {
+            flex: 1;
+            max-width: 420px;
+            margin: 0 1.5rem;
         }
-        .nav-links a:hover { color: white; }
+        .search-bar input {
+            width: 100%;
+            padding: 10px 18px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.9);
+            color: #111;
+        }
+        .search-bar input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 82, 82, 0.4);
+        }
 
         .hamburger {
             font-size: 1.9rem;
@@ -73,16 +85,18 @@
         }
 
         .welcome-text {
-            font-size: 1.35rem;
+            font-size: 1.4rem;
             color: #ddd;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
+            font-weight: 300;
         }
 
         .logo {
-            font-size: 3.5rem;
+            font-size: 3.8rem;
             font-weight: 900;
             color: #ff5252;
-            text-shadow: 0 4px 15px rgba(0,0,0,0.9);
+            text-shadow: 0 4px 20px rgba(0,0,0,0.9);
+            letter-spacing: 2px;
         }
 
         /* Main Content */
@@ -92,6 +106,30 @@
             margin: 0 auto;
             flex: 1;
         }
+
+        /* Side Menu */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            right: -350px;
+            width: 320px;
+            height: 100%;
+            background: #1a1a2e;
+            transition: right 0.4s ease;
+            padding: 2.5rem 1.5rem;
+            box-shadow: -5px 0 25px rgba(0,0,0,0.7);
+            z-index: 2000;
+        }
+        .side-menu.open { right: 0; }
+        .side-menu a {
+            display: block;
+            padding: 1.1rem 0;
+            color: #ddd;
+            text-decoration: none;
+            border-bottom: 1px solid #333;
+            font-size: 1.1rem;
+        }
+        .side-menu a:hover { color: var(--primary-red); background: #2a2a40; }
 
         /* Footer */
         .footer {
@@ -110,14 +148,14 @@
     <!-- Hero Header -->
     <header class="hero-header">
         <div class="top-bar">
-            <div class="nav-links">
-                {% if user.is_authenticated %}
-                    <a href="/">Home</a>
-                    {% if user.is_staff or user.is_superuser %}
-                        <a href="{% url 'admin:index' %}" style="color: #ffeb3b;">Admin Panel</a>
-                    {% endif %}
-                {% endif %}
+            <!-- Search Bar in Navbar -->
+            <div class="search-bar">
+                <form method="get" action="{% url 'search' %}">
+                    <input type="text" name="q" placeholder="Search for artist, event..." 
+                           value="{{ request.GET.q|default:'' }}">
+                </form>
             </div>
+
             <div class="hamburger" id="hamburger">☰</div>
         </div>
 
