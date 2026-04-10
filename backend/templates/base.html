@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Ticket2X{% endblock %}</title>
     
-    <!-- Add this line here -->
     {% load static %}
 
     <style>
@@ -15,14 +14,14 @@
             --nav-bg: #111;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
             font-family: Arial, sans-serif;
-            background: var(--dark-bg);
             color: #eee;
             min-height: 100vh;
         }
 
-        /* ==================== NAVBAR ==================== */
+        /* Navbar */
         .navbar {
             background: var(--nav-bg);
             padding: 1rem 2rem;
@@ -41,7 +40,6 @@
             text-decoration: none;
         }
 
-        /* Nav links - only for logged-in users */
         .nav-links {
             display: flex;
             align-items: center;
@@ -54,7 +52,6 @@
         }
         .nav-links a:hover { color: white; }
 
-        /* Floating Hamburger */
         .hamburger {
             font-size: 1.9rem;
             cursor: pointer;
@@ -89,7 +86,7 @@
         }
         .side-menu a:hover { color: var(--primary-red); background: #2a2a40; }
 
-        /* Background Image for the whole site */
+        /* Background Image */
         body {
             background: linear-gradient(rgba(15, 15, 26, 0.92), rgba(15, 15, 26, 0.92)), 
                         url('{% static "img/background.jpg" %}') center/cover no-repeat fixed;
@@ -110,7 +107,6 @@
             {% endif %}
         </div>
 
-        <!-- Floating Hamburger -->
         <div class="hamburger" id="hamburger">☰</div>
     </nav>
 
