@@ -5,7 +5,10 @@
 {% block content %}
   <div style="max-width: 460px; margin: 5rem auto; padding: 2.5rem; 
               background: rgba(30, 30, 40, 0.95); border-radius: 16px; 
-              box-shadow: 0 10px 40px rgba(0,0,0,0.6); color: #eee;">
+              box-shadow: 0 10px 40px rgba(0,0,0,0.6),
+                          0 0 25px rgba(255, 82, 82, 0.6);   /* Red glow around the card */
+              border: 2px solid #ff5252;   /* Optional subtle red border */
+              color: #eee;">
 
     <h2 style="text-align: center; margin-bottom: 2rem; color: #ff5252;">
       Login to Ticket2X
@@ -22,23 +25,23 @@
 
       <!-- Email Field - Bigger -->
       <div style="margin-bottom: 1.8rem;">
-        <label style="display: block; margin-bottom: 0.6rem; color: #ccc; font-size: 1.1rem;">Email Address</label>
+        <label style="display: block; margin-bottom: 0.6rem; color: #d8d7d7; font-size: 1.15rem;">Email Address</label>
         {{ form.username }}
       </div>
 
       <!-- Password Field - Bigger with Eye Icon Inside -->
       <div style="margin-bottom: 2.2rem; position: relative;">
-        <label style="display: block; margin-bottom: 0.6rem; color: #ccc; font-size: 1.1rem;">Password</label>
+        <label style="display: block; margin-bottom: 0.6rem; color: #ccc; font-size: 1.15rem;">Password</label>
         {{ form.password }}
-        <span onclick="togglePassword('id_password', this)" 
-              style="position: absolute; right: 18px; top: 48px; cursor: pointer; color: #aaa; font-size: 1.4rem;">
+        <span onclick="togglePassword()" 
+              style="position: absolute; right: 18px; top: 52px; cursor: pointer; color: #aaa; font-size: 1.5rem;">
           👁️
         </span>
       </div>
 
       <button type="submit" 
-              style="width: 100%; padding: 16px; background: #d32f2f; color: white; 
-                     border: none; border-radius: 10px; font-size: 1.2rem; font-weight: bold; cursor: pointer;">
+              style="width: 100%; padding: 18px; background: #d32f2f; color: white; 
+                     border: none; border-radius: 10px; font-size: 1.25rem; font-weight: bold; cursor: pointer;">
         Login
       </button>
     </form>
@@ -50,15 +53,12 @@
   </div>
 
   <script>
-    function togglePassword(fieldId, el) {
-      const pwd = document.getElementById(fieldId);
-      if (!pwd) return;
+    function togglePassword() {
+      const pwd = document.getElementById('id_password');
       if (pwd.type === "password") {
         pwd.type = "text";
-        el.textContent = "🙈";
       } else {
         pwd.type = "password";
-        el.textContent = "👁️";
       }
     }
   </script>
