@@ -24,28 +24,28 @@
     <form method="post" action="{% url 'accounts:login' %}">
       {% csrf_token %}
 
-      <!-- Larger Email Field -->
-      <div style="margin-bottom: 2rem;">
-        <label style="display: block; margin-bottom: 0.8rem; color: #d8d7d7; font-size: 1.25rem;">Email Address</label>
+      <!-- Much Bigger Email Field -->
+      <div style="margin-bottom: 2.2rem;">
+        <label style="display: block; margin-bottom: 0.8rem; color: #d8d7d7; font-size: 1.3rem;">Email Address</label>
         {{ form.username }}
       </div>
 
-      <!-- Larger Password Field with Eye Inside -->
+      <!-- Much Bigger Password Field with Eye Inside the Box -->
       <div style="margin-bottom: 2.5rem; position: relative;">
-        <label style="display: block; margin-bottom: 0.8rem; color: #ccc; font-size: 1.25rem;">Password</label>
+        <label style="display: block; margin-bottom: 0.8rem; color: #ccc; font-size: 1.3rem;">Password</label>
         <div style="position: relative;">
           {{ form.password }}
           <span onclick="togglePassword()" 
-                style="position: absolute; right: 18px; top: 50%; transform: translateY(-50%); 
-                       cursor: pointer; color: #aaa; font-size: 1.8rem; z-index: 10;">
+                style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); 
+                       cursor: pointer; color: #aaa; font-size: 1.9rem; z-index: 10;">
             👁️
           </span>
         </div>
       </div>
 
       <button type="submit" 
-              style="width: 100%; padding: 18px; background: #d32f2f; color: white; 
-                     border: none; border-radius: 10px; font-size: 1.3rem; font-weight: bold; cursor: pointer;">
+              style="width: 100%; padding: 20px; background: #d32f2f; color: white; 
+                     border: none; border-radius: 10px; font-size: 1.35rem; font-weight: bold; cursor: pointer;">
         Login
       </button>
     </form>
