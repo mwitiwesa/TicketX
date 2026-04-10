@@ -151,7 +151,7 @@
             <!-- Search Bar - Centered -->
             <div class="search-bar">
                 <form method="get" action="{% url 'search' %}">
-                    <input type="text" name="q" placeholder="Search for artist, event..." 
+                    <input type="text" name="q" placeholder="Search for artist, event, location.." 
                            value="{{ request.GET.q|default:'' }}">
                 </form>
             </div>
