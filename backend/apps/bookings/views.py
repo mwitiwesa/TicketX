@@ -337,3 +337,15 @@ def generate_promo_code(request, event_id):
         return redirect('admin:bookings_promocode_changelist')  # go to promo list
 
     return redirect('admin:bookings_promocode_changelist')
+
+@login_required
+def my_tickets(request):
+    """Show user's tickets: Pending, Paid, and Downloaded"""
+    bookings = Booking.objects.filter(
+        user=request.user
+    ).order_by('-created_at')
+
+    context = {
+        'bookings': bookings,
+    }
+    return render(request, 'bookings/my_tickets.html', context)

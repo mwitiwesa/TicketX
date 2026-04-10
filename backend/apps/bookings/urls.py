@@ -13,4 +13,5 @@ urlpatterns = [
     path('validate-qr/', views.validate_qr, name='validate_qr'),
     #path('ticket-action/<int:booking_id>/', views.ticket_action, name='ticket_action'),
     path('generate-promo/<int:event_id>/', views.generate_promo_code, name='generate_promo_code'),
+    path('my-tickets/', views.my_tickets, name='my_tickets'),
 ]

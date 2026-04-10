@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}My Tickets - Ticket2X{% endblock %}
+
+{% block content %}
+  <div class="container py-5">
+    <h2 class="text-center mb-5" style="color: #ff5252;">My Tickets</h2>
+
+    {% if bookings %}
+      <div class="row justify-content-center">
+        {% for booking in bookings %}
+          <div class="col-lg-8 col-md-10 mb-4">
+            <div style="background: #111; border-radius: 16px; padding: 2rem; 
+                        box-shadow: 0 0 30px rgba(211, 47, 47, 0.4); border: 1px solid #ff5252;">
+              
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 style="color: #ff9800;">{{ booking.ticket.event.title }}</h5>
+                <span style="color: {% if booking.is_paid %}#4caf50{% else %}#ff9800{% endif %}; font-weight: bold;">
+                  {{ booking.get_status_display|default:booking.status }}
+                </span>
+              </div>
+
+              <p><strong>Type:</strong> {{ booking.ticket.name }} × {{ booking.quantity }}</p>
+              <p><strong>Total:</strong> KES {{ booking.total_price|floatformat:2 }}</p>
+              <p><strong>Created:</strong> {{ booking.created_at|date:"d M Y H:i" }}</p>
+
+              {% if booking.is_paid %}
+                <div class="text-center mt-4">
+                  <a href="{% url 'bookings:download_tickets' booking.id %}" 
+                     class="btn btn-success btn-lg px-5">
+                    Download Ticket{{ booking.quantity|pluralize }}
+                  </a>
+                </div>
+              {% else %}
+                <div class="alert alert-warning text-center mt-3">
+                  Payment pending • You can download after payment
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="text-center py-5">
+        <h4 style="color: #888;">You have no tickets yet</h4>
+        <p>Browse events and book your first ticket!</p>
+        <a href="{% url 'core:home' %}" class="btn btn-danger">Browse Events</a>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}
