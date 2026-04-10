@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from apps.core import views as core_views  
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -16,6 +17,7 @@ urlpatterns = [
     path('bookings/', include('apps.bookings.urls')),
     path('calendar/', include('apps.calendar_view.urls')), 
     path('', include('apps.core.urls')),
+path('search/', core_views.search, name='search'),
 ]
 
 if settings.DEBUG:

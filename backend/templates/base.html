@@ -21,41 +21,38 @@
             flex-direction: column;
         }
 
-        /* Full Page Background Image - Fixed & Reliable */
-        body {
-            background: linear-gradient(rgba(15, 15, 26, 0.85), rgba(15, 15, 26, 0.85)), 
-                        url('/static/img/background.jpg') center/cover no-repeat fixed;
-        }
-
-        /* ==================== HERO HEADER (Different Image) ==================== */
+        /* Hero Header */
         .hero-header {
-            background: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), 
-                        url('/static/img/header.jpg') center/cover no-repeat;  
-            height: 260px;
+            background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), 
+                        url('/static/img/background.jpg') center/cover no-repeat;
+            height: 320px;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
-        }
-
-        .hero-content {
             text-align: center;
-            width: 100%;
-            max-width: 700px;
         }
 
         .logo {
+            font-size: 4.5rem;
+            font-weight: 900;
             color: #ff5252;
-            font-size: 3rem;
-            font-weight: bold;
-            text-decoration: none;
-            margin-bottom: 1rem;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.9);
+            letter-spacing: 3px;
         }
 
+        .tagline {
+            font-size: 1.35rem;
+            color: #ddd;
+            margin-top: 10px;
+            font-weight: 300;
+        }
+
+        /* Search Bar */
         .search-bar {
             width: 100%;
-            max-width: 550px;
-            margin: 0 auto;
+            max-width: 580px;
+            margin: 20px auto 0;
         }
         .search-bar input {
             width: 100%;
@@ -68,10 +65,10 @@
         }
         .search-bar input:focus {
             outline: none;
-            box-shadow: 0 0 0 4px rgba(255, 82, 82, 0.4);
+            box-shadow: 0 0 0 5px rgba(255, 82, 82, 0.4);
         }
 
-        /* Navbar below hero */
+        /* Navbar */
         .navbar {
             background: #111;
             padding: 1rem 2rem;
@@ -133,13 +130,17 @@
 </head>
 <body>
 
-    <!-- Hero Header with Logo + Search -->
+    <!-- Hero Header -->
     <header class="hero-header">
-        <div class="hero-content">
-            <a href="/" class="logo">Ticket2X</a>
+        <div>
+            <a href="/" class="logo">TICKET2X</a>
+            <p class="tagline">Discover Events • Book Tickets • Enjoy Moments</p>
+            
+            <!-- Working Search Bar -->
             <div class="search-bar">
                 <form method="get" action="{% url 'search' %}">
-                    <input type="text" name="q" placeholder="Search events..." value="{{ request.GET.q|default:'' }}">
+                    <input type="text" name="q" placeholder="Search events, artists, or locations..." 
+                           value="{{ request.GET.q|default:'' }}">
                 </form>
             </div>
         </div>
@@ -182,7 +183,7 @@
     <!-- Footer -->
     <footer class="footer">
         &copy; {% now "Y" %} Ticket2X. All Rights Reserved.<br>
-        <span style="margin-top: 5px; display: inline-block;">Made by Wesa Mwiti</span>
+        <span style="margin-top: 5px; display: inline-block;">Made with ❤️ in Kenya</span>
     </footer>
 
     <script>
