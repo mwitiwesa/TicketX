@@ -1,9 +1,10 @@
 {% extends 'base.html' %}
 {% block title %}Checkout - Ticket2X{% endblock %}
+
 {% block content %}
   <div class="container py-5">
     <div class="row justify-content-center">
-      <div class="col-lg-6 col-md-8">
+      <div class="col-lg-7 col-md-9">
 
         {% if messages %}
           <div class="mb-4">
@@ -16,7 +17,9 @@
           </div>
         {% endif %}
 
-        <div class="card shadow-lg border-0" style="border-radius: 16px; background: #111;">
+        <!-- Centered glowing card -->
+        <div class="card shadow-lg border-0" style="border-radius: 18px; background: #111; 
+                    box-shadow: 0 0 40px rgba(211, 47, 47, 0.5); border: 2px solid #ff5252;">
 
           <div class="card-header text-center py-4" style="background: linear-gradient(135deg, #d32f2f, #b71c1c); color: white;">
             <h2 class="mb-0">Complete Payment</h2>
@@ -35,10 +38,9 @@
               </p>
             </div>
 
-            <!-- PROMO CODE SECTION -->
+            <!-- Promo Code Section -->
             <div class="promo-section mb-5" style="padding: 1.5rem; background: rgba(255,152,0,0.1); border: 1px solid #ff9800; border-radius: 12px;">
               <h4 class="text-center mb-3" style="color: #ff9800;">Have a Promo Code?</h4>
-              
               <form method="post" action="{% url 'bookings:checkout' booking.id %}">
                 {% csrf_token %}
                 <div class="input-group input-group-lg">
@@ -61,7 +63,7 @@
               Final to Pay: KES {{ final_total|floatformat:2 }}
             </p>
 
-            <!-- FINAL PAYMENT FORM -->
+            <!-- Payment Form -->
             <form method="post" action="{% url 'bookings:checkout' booking.id %}">
               {% csrf_token %}
               <div class="mb-4">

@@ -1,8 +1,10 @@
 from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import format_html
-from .models import Booking
-from .models import PromoCode
+from django.shortcuts import redirect  
+
+from .models import Booking, PromoCode
+
 
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
@@ -16,6 +18,7 @@ class BookingAdmin(admin.ModelAdmin):
         'is_paid',
         'created_at',
     )
+    list_display_links = ('id', 'user', 'ticket')   
     list_filter = ('status', 'is_paid', 'created_at', 'ticket__event')
     search_fields = ('user__email', 'ticket__event__title', 'ticket__name')
     readonly_fields = ('total_price', 'created_at', 'updated_at')
@@ -23,7 +26,7 @@ class BookingAdmin(admin.ModelAdmin):
 
     # Prevent manual creation in admin (recommended — use frontend instead)
     def has_add_permission(self, request):
-        return False  # change to True if admins should create bookings manually
+        return False
 
     # Add QR Scanner link/button in the admin change list (Bookings list page)
     def changelist_view(self, request, extra_context=None):
