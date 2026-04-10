@@ -4,20 +4,20 @@
 
 {% block content %}
   <div class="container py-5" style="max-width: 720px;">
-    <!-- Centered glowing card -->
-    <div style="background: #111; border-radius: 18px; padding: 2.8rem; 
-                box-shadow: 0 0 40px rgba(211, 47, 47, 0.5), 
+    <!-- Bigger, centered glowing card -->
+    <div style="background: #111; border-radius: 20px; padding: 3rem; 
+                box-shadow: 0 0 45px rgba(211, 47, 47, 0.5), 
                             0 0 20px rgba(211, 47, 47, 0.3); 
                 border: 2px solid #ff5252; color: #eee;">
 
-      <h2 style="text-align: center; color: #ff5252; margin-bottom: 2rem; font-size: 1.9rem;">
+      <h2 style="text-align: center; color: #ff5252; margin-bottom: 2.2rem; font-size: 2rem;">
         Booking #{{ booking.id }}
       </h2>
 
-      <div style="background: rgba(30, 30, 40, 0.85); border-radius: 12px; padding: 1.8rem; margin-bottom: 2rem;">
-        <h4 style="color: #ff9800; margin-bottom: 1.2rem;">{{ booking.ticket.event.title }}</h4>
+      <div style="background: rgba(30, 30, 40, 0.85); border-radius: 14px; padding: 2rem; margin-bottom: 2.5rem;">
+        <h4 style="color: #ff9800; margin-bottom: 1.2rem; font-size: 1.4rem;">{{ booking.ticket.event.title }}</h4>
         
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; color: #ddd; font-size: 1.05rem;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.8rem; color: #ddd; font-size: 1.1rem;">
           <div><strong style="color: #bbb;">Type:</strong><br>{{ booking.ticket.name }}</div>
           <div><strong style="color: #bbb;">Quantity:</strong><br>{{ booking.quantity }}</div>
           <div><strong style="color: #bbb;">Total Paid:</strong><br>KES {{ booking.total_price|floatformat:2 }}</div>
@@ -34,7 +34,7 @@
         <div class="text-center mb-4">
           <a href="{% url 'bookings:download_tickets' booking.id %}" 
              class="btn btn-success btn-lg px-5 py-3 fw-bold" 
-             style="font-size: 1.3rem; border-radius: 10px;">
+             style="font-size: 1.35rem; border-radius: 12px;">
             Download Ticket{% if booking.quantity > 1 %}s{% endif %} (PDF)
           </a>
         </div>
@@ -49,13 +49,13 @@
           </div>
         {% endif %}
       {% else %}
-        <div class="alert alert-warning text-center" style="font-size: 1.1rem;">
+        <div class="alert alert-warning text-center" style="font-size: 1.15rem;">
           <strong>Payment not completed yet.</strong><br>
           You will be able to download tickets after payment is confirmed.
         </div>
       {% endif %}
 
-      <div style="text-align: center; margin-top: 2rem; color: #888; font-size: 0.95rem;">
+      <div style="text-align: center; margin-top: 2.5rem; color: #888; font-size: 1rem;">
         Booking ID: {{ booking.id }} • Created: {{ booking.created_at|date:"d M Y H:i" }}
       </div>
     </div>

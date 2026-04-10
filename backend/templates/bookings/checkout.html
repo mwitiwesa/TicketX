@@ -4,7 +4,7 @@
 {% block content %}
   <div class="container py-5">
     <div class="row justify-content-center">
-      <div class="col-lg-7 col-md-9">
+      <div class="col-lg-8 col-md-10">
 
         {% if messages %}
           <div class="mb-4">
@@ -17,30 +17,31 @@
           </div>
         {% endif %}
 
-        <!-- Centered glowing card -->
-        <div class="card shadow-lg border-0" style="border-radius: 18px; background: #111; 
-                    box-shadow: 0 0 40px rgba(211, 47, 47, 0.5); border: 2px solid #ff5252;">
+        <!-- Bigger, centered glowing card -->
+        <div class="card shadow-lg border-0" style="border-radius: 20px; background: #111; 
+                    box-shadow: 0 0 45px rgba(211, 47, 47, 0.5); border: 2px solid #ff5252;">
 
-          <div class="card-header text-center py-4" style="background: linear-gradient(135deg, #d32f2f, #b71c1c); color: white;">
-            <h2 class="mb-0">Complete Payment</h2>
+          <div class="card-header text-center py-5" style="background: linear-gradient(135deg, #d32f2f, #b71c1c); color: white;">
+            <h2 class="mb-0" style="font-size: 2rem;">Complete Payment</h2>
           </div>
 
-          <div class="card-body p-4 p-md-5">
+          <div class="card-body p-5">
 
             <!-- Booking Summary -->
             <div class="text-center mb-5">
-              <h4 class="text-danger fw-bold mb-2">
+              <h4 class="text-danger fw-bold mb-2" style="font-size: 1.4rem;">
                 Booking #{{ booking.id }} – {{ booking.ticket.name }} × {{ booking.quantity }}
               </h4>
-              <p class="text-muted mb-1">Event: {{ booking.ticket.event.title }}</p>
+              <p class="text-muted mb-1" style="font-size: 1.1rem;">Event: {{ booking.ticket.event.title }}</p>
               <p class="h3 fw-bold text-danger mt-3">
                 Original: KES {{ booking.total_price|floatformat:2 }}
               </p>
             </div>
 
             <!-- Promo Code Section -->
-            <div class="promo-section mb-5" style="padding: 1.5rem; background: rgba(255,152,0,0.1); border: 1px solid #ff9800; border-radius: 12px;">
-              <h4 class="text-center mb-3" style="color: #ff9800;">Have a Promo Code?</h4>
+            <div class="promo-section mb-5" style="padding: 1.8rem; background: rgba(255,152,0,0.1); border: 1px solid #ff9800; border-radius: 12px;">
+              <h4 class="text-center mb-3" style="color: #ff9800; font-size: 1.3rem;">Have a Promo Code?</h4>
+              
               <form method="post" action="{% url 'bookings:checkout' booking.id %}">
                 {% csrf_token %}
                 <div class="input-group input-group-lg">
@@ -59,7 +60,7 @@
             </div>
 
             <!-- Final Total -->
-            <p class="text-center h3 fw-bold text-danger mt-4 mb-5">
+            <p class="text-center h3 fw-bold text-danger mt-4 mb-5" style="font-size: 1.8rem;">
               Final to Pay: KES {{ final_total|floatformat:2 }}
             </p>
 
@@ -67,19 +68,19 @@
             <form method="post" action="{% url 'bookings:checkout' booking.id %}">
               {% csrf_token %}
               <div class="mb-4">
-                <label for="phone" class="form-label text-center d-block mb-3 fw-bold" style="color: #ddd; font-size: 1.1rem;">
+                <label for="phone" class="form-label text-center d-block mb-3 fw-bold" style="color: #ddd; font-size: 1.15rem;">
                   M-Pesa Phone Number
                 </label>
                 <input type="tel" name="phone" id="phone" required
                        placeholder="2547xxxxxxxx" pattern="254[0-9]{9}"
                        class="form-control form-control-lg text-center"
-                       style="background: #222; color: #eee; border: 1px solid #444; border-radius: 10px;">
+                       style="background: #222; color: #eee; border: 1px solid #444; border-radius: 10px; padding: 1rem;">
                 <small class="form-text text-muted text-center d-block mt-2">
                   Enter the number you want to pay with (must start with 254)
                 </small>
               </div>
 
-              <button type="submit" class="btn btn-danger btn-lg w-100 py-3 fw-bold" style="font-size: 1.2rem; border-radius: 10px;">
+              <button type="submit" class="btn btn-danger btn-lg w-100 py-3 fw-bold" style="font-size: 1.3rem; border-radius: 10px;">
                 Pay KES {{ final_total|floatformat:2 }} with M-Pesa
               </button>
             </form>
