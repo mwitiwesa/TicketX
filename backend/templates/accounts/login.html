@@ -3,14 +3,15 @@
 {% block title %}Login - Ticket2X{% endblock %}
 
 {% block content %}
-  <div style="max-width: 460px; margin: 5rem auto; padding: 2.8rem; 
-              background: rgba(30, 30, 40, 0.95); border-radius: 16px; 
-              box-shadow: 0 10px 40px rgba(0,0,0,0.6),
-                          0 0 30px rgba(255, 82, 82, 0.7);   /* Strong red glow around card */
-              border: 2px solid #ff5252;
+  <div style="max-width: 480px; margin: 5rem auto; padding: 3rem 2.5rem; 
+              background: rgba(30, 30, 40, 0.95); 
+              border-radius: 18px; 
+              box-shadow: 0 12px 50px rgba(0,0,0,0.7),
+                          0 0 35px rgba(255, 82, 82, 0.8);   /* Strong red glow around card */
+              border: 3px solid #ff5252;
               color: #eee;">
 
-    <h2 style="text-align: center; margin-bottom: 2rem; color: #ff5252;">
+    <h2 style="text-align: center; margin-bottom: 2.2rem; color: #ff5252; font-size: 2rem;">
       Login to Ticket2X
     </h2>
 
@@ -29,24 +30,27 @@
         {{ form.username }}
       </div>
 
-      <!-- Bigger Password Field with Eye Inside -->
+      <!-- Bigger Password Field with Eye INSIDE -->
       <div style="margin-bottom: 2.5rem; position: relative;">
         <label style="display: block; margin-bottom: 0.7rem; color: #ccc; font-size: 1.2rem;">Password</label>
-        {{ form.password }}
-        <span onclick="togglePassword()" 
-              style="position: absolute; right: 16px; top: 52px; cursor: pointer; color: #aaa; font-size: 1.6rem; z-index: 10;">
-          👁️
-        </span>
+        <div style="position: relative;">
+          {{ form.password }}
+          <span onclick="togglePassword()" 
+                style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); 
+                       cursor: pointer; color: #aaa; font-size: 1.7rem; z-index: 10;">
+            👁️
+          </span>
+        </div>
       </div>
 
       <button type="submit" 
               style="width: 100%; padding: 18px; background: #d32f2f; color: white; 
-                     border: none; border-radius: 10px; font-size: 1.25rem; font-weight: bold; cursor: pointer;">
+                     border: none; border-radius: 10px; font-size: 1.3rem; font-weight: bold; cursor: pointer;">
         Login
       </button>
     </form>
 
-    <p style="text-align: center; margin-top: 2rem; color: #aaa; font-size: 1.05rem;">
+    <p style="text-align: center; margin-top: 2.2rem; color: #aaa; font-size: 1.1rem;">
       Don't have an account? 
       <a href="{% url 'accounts:register' %}" style="color: #ff9999;">Register here</a>
     </p>

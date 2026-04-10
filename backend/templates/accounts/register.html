@@ -7,8 +7,8 @@
               background: rgba(30, 30, 40, 0.95); 
               border-radius: 18px; 
               box-shadow: 0 12px 50px rgba(0,0,0,0.7),
-                          0 0 35px rgba(255, 82, 82, 0.75);   /* Strong red glow around card */
-              border: 3px solid #ff5252;   /* Extra red accent */
+                          0 0 35px rgba(255, 82, 82, 0.8);   /* Strong red glow around card */
+              border: 3px solid #ff5252;
               color: #eee;">
 
     <h2 style="text-align: center; margin-bottom: 2.2rem; color: #ff5252; font-size: 2rem;">
@@ -42,27 +42,33 @@
         {% endif %}
       </div>
 
-      <!-- Bigger Password Field with Eye Inside -->
+      <!-- Bigger Password Field with Eye INSIDE -->
       <div style="margin-bottom: 2rem; position: relative;">
         <label style="display: block; margin-bottom: 0.7rem; color: #ccc; font-size: 1.2rem;">Password</label>
-        {{ form.password1 }}
-        <span onclick="togglePassword('id_password1', this)" 
-              style="position: absolute; right: 16px; top: 54px; cursor: pointer; color: #aaa; font-size: 1.7rem; z-index: 10;">
-          👁️
-        </span>
+        <div style="position: relative;">
+          {{ form.password1 }}
+          <span onclick="togglePassword('id_password1', this)" 
+                style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); 
+                       cursor: pointer; color: #aaa; font-size: 1.7rem; z-index: 10;">
+            👁️
+          </span>
+        </div>
         {% if form.password1.errors %}
           <div style="color: #ff6666; font-size: 0.95rem; margin-top: 0.3rem;">{{ form.password1.errors }}</div>
         {% endif %}
       </div>
 
-      <!-- Bigger Confirm Password Field with Eye Inside -->
+      <!-- Bigger Confirm Password Field with Eye INSIDE -->
       <div style="margin-bottom: 2.5rem; position: relative;">
         <label style="display: block; margin-bottom: 0.7rem; color: #ccc; font-size: 1.2rem;">Confirm Password</label>
-        {{ form.password2 }}
-        <span onclick="togglePassword('id_password2', this)" 
-              style="position: absolute; right: 16px; top: 54px; cursor: pointer; color: #aaa; font-size: 1.7rem; z-index: 10;">
-          👁️
-        </span>
+        <div style="position: relative;">
+          {{ form.password2 }}
+          <span onclick="togglePassword('id_password2', this)" 
+                style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); 
+                       cursor: pointer; color: #aaa; font-size: 1.7rem; z-index: 10;">
+            👁️
+          </span>
+        </div>
         {% if form.password2.errors %}
           <div style="color: #ff6666; font-size: 0.95rem; margin-top: 0.3rem;">{{ form.password2.errors }}</div>
         {% endif %}
