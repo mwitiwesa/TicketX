@@ -97,11 +97,6 @@
                 {% if user.is_staff or user.is_superuser %}
                     <a href="{% url 'admin:index' %}" style="color: #ffeb3b;">Admin Panel</a>
                 {% endif %}
-                <a href="{% url 'accounts:logout' %}">Logout</a>
-            {% else %}
-                <a href="{% url 'accounts:login' %}">Login</a>
-                <a href="{% url 'accounts:register' %}">Register</a>
-            {% endif %}
         </div>
 
         <!-- Floating Hamburger -->

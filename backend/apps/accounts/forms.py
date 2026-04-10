@@ -13,6 +13,6 @@ class CustomAuthenticationForm(AuthenticationForm):
         widget=forms.EmailInput(attrs={
             'autofocus': True,
             'placeholder': 'Enter your email address',
-            'class': 'form-control'   # optional for styling
+            #'class': 'form-control'   # optional for styling
         })
     )

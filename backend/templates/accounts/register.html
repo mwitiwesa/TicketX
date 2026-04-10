@@ -33,18 +33,15 @@
     <form method="post">
       {% csrf_token %}
 
-      <!-- Much Bigger Email Field -->
+      <!-- Much Bigger Email Input Box -->
       <div style="margin-bottom: 2.2rem;">
-        <label style="display: block; margin-bottom: 0.8rem; color: #d8d7d7; font-size: 1.3rem;">Email Address</label>
+        <label style="display: block; margin-bottom: 0.8rem; color: #d8d7d7; font-size: 1.25rem;">Email Address</label>
         {{ form.email }}
-        {% if form.email.errors %}
-          <div style="color: #ff6666; font-size: 0.95rem; margin-top: 0.3rem;">{{ form.email.errors }}</div>
-        {% endif %}
       </div>
 
-      <!-- Much Bigger Password Field with Eye Inside -->
+      <!-- Much Bigger Password Input Box with Eye Inside -->
       <div style="margin-bottom: 2.2rem; position: relative;">
-        <label style="display: block; margin-bottom: 0.8rem; color: #ccc; font-size: 1.3rem;">Password</label>
+        <label style="display: block; margin-bottom: 0.8rem; color: #ccc; font-size: 1.25rem;">Password</label>
         <div style="position: relative;">
           {{ form.password1 }}
           <span onclick="togglePassword('id_password1', this)" 
@@ -53,14 +50,11 @@
             👁️
           </span>
         </div>
-        {% if form.password1.errors %}
-          <div style="color: #ff6666; font-size: 0.95rem; margin-top: 0.3rem;">{{ form.password1.errors }}</div>
-        {% endif %}
       </div>
 
-      <!-- Much Bigger Confirm Password Field with Eye Inside -->
+      <!-- Much Bigger Confirm Password Input Box with Eye Inside -->
       <div style="margin-bottom: 2.5rem; position: relative;">
-        <label style="display: block; margin-bottom: 0.8rem; color: #ccc; font-size: 1.3rem;">Confirm Password</label>
+        <label style="display: block; margin-bottom: 0.8rem; color: #ccc; font-size: 1.25rem;">Confirm Password</label>
         <div style="position: relative;">
           {{ form.password2 }}
           <span onclick="togglePassword('id_password2', this)" 
@@ -69,9 +63,6 @@
             👁️
           </span>
         </div>
-        {% if form.password2.errors %}
-          <div style="color: #ff6666; font-size: 0.95rem; margin-top: 0.3rem;">{{ form.password2.errors }}</div>
-        {% endif %}
       </div>
 
       <button type="submit" 
