@@ -30,7 +30,7 @@
         /* Hero Header */
         .hero-header {
             background: linear-gradient(rgba(0, 0, 0, 0.78), rgba(0, 0, 0, 0.78)), 
-                        url('/static/img/background.jpg') center/cover no-repeat;
+                        url('/static/img/header.jpg') center/cover no-repeat;
             height: 240px;
             position: relative;
         }
@@ -39,8 +39,8 @@
             background: rgba(0, 0, 0, 0.85);
             padding: 0.8rem 2rem;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
             position: absolute;
             top: 0;
             left: 0;
@@ -48,24 +48,24 @@
             z-index: 10;
         }
 
-        /* Search Bar in Navbar */
+        /* Search Bar - Centered in the middle */
         .search-bar {
             flex: 1;
-            max-width: 420px;
-            margin: 0 1.5rem;
+            max-width: 480px;
+            margin: 0 20px;
         }
         .search-bar input {
             width: 100%;
-            padding: 10px 18px;
-            font-size: 1rem;
+            padding: 12px 20px;
+            font-size: 1.05rem;
             border: none;
             border-radius: 30px;
-            background: rgba(255,255,255,0.9);
+            background: rgba(255,255,255,0.92);
             color: #111;
         }
         .search-bar input:focus {
             outline: none;
-            box-shadow: 0 0 0 3px rgba(255, 82, 82, 0.4);
+            box-shadow: 0 0 0 4px rgba(255, 82, 82, 0.4);
         }
 
         .hamburger {
@@ -148,7 +148,7 @@
     <!-- Hero Header -->
     <header class="hero-header">
         <div class="top-bar">
-            <!-- Search Bar in Navbar -->
+            <!-- Search Bar - Centered -->
             <div class="search-bar">
                 <form method="get" action="{% url 'search' %}">
                     <input type="text" name="q" placeholder="Search for artist, event..." 
@@ -189,7 +189,7 @@
     <!-- Footer -->
     <footer class="footer">
         &copy; {% now "Y" %} Ticket2X. All Rights Reserved.<br>
-        <span style="margin-top: 5px; display: inline-block;">Made with ❤️ in Kenya</span>
+        <span style="margin-top: 5px; display: inline-block;">Made by Wesa Mwiti</span>
     </footer>
 
     <script>
