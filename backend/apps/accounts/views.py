@@ -40,4 +40,4 @@ def promote_admin(request):
         user.save()
         return HttpResponse(f"<h2 style='color:green;'>✅ Successfully promoted {user.email} to Admin!</h2><p>You can now logout and login again as admin.</p>")
     except User.DoesNotExist:
-        return HttpResponse(f"<h2 style='color:red;'>User with email adminfinal@ticket2x.com not found.</h2><p>Please register this email first.</p>")
+        return HttpResponse(f"<h2 style='color:red;'>User with email admin1@ticket2x.com not found.</h2><p>Please register this email first.</p>")
