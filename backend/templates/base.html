@@ -10,8 +10,6 @@
     <style>
         :root {
             --primary-red: #ff5252;
-            --dark-bg: #0f0f1a;
-            --nav-bg: #111;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -20,37 +18,74 @@
             color: #eee;
             min-height: 100vh;
             display: flex;
-            flex-direction: column;           /* Important for footer */
+            flex-direction: column;
         }
 
-        /* ==================== NAVBAR ==================== */
+        /* Full Page Background Image - Fixed & Reliable */
+        body {
+            background: linear-gradient(rgba(15, 15, 26, 0.85), rgba(15, 15, 26, 0.85)), 
+                        url('/static/img/background.jpg') center/cover no-repeat fixed;
+        }
+
+        /* ==================== HERO HEADER (Different Image) ==================== */
+        .hero-header {
+            background: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), 
+                        url('/static/img/header.jpg') center/cover no-repeat;   /* ← Change this if you have a different header image */
+            height: 260px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .hero-content {
+            text-align: center;
+            width: 100%;
+            max-width: 700px;
+        }
+
+        .logo {
+            color: #ff5252;
+            font-size: 3rem;
+            font-weight: bold;
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .search-bar {
+            width: 100%;
+            max-width: 550px;
+            margin: 0 auto;
+        }
+        .search-bar input {
+            width: 100%;
+            padding: 16px 24px;
+            font-size: 1.15rem;
+            border: none;
+            border-radius: 50px;
+            background: rgba(255,255,255,0.95);
+            color: #111;
+        }
+        .search-bar input:focus {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(255, 82, 82, 0.4);
+        }
+
+        /* Navbar below hero */
         .navbar {
-            background: var(--nav-bg);
+            background: #111;
             padding: 1rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
             box-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
-        .logo {
-            color: var(--primary-red);
-            font-size: 1.9rem;
-            font-weight: bold;
-            text-decoration: none;
-        }
 
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 1.8rem;
-        }
         .nav-links a {
             color: #ccc;
             text-decoration: none;
             font-size: 1.05rem;
+            margin-right: 1.8rem;
         }
         .nav-links a:hover { color: white; }
 
@@ -58,10 +93,6 @@
             font-size: 1.9rem;
             cursor: pointer;
             color: white;
-            position: absolute;
-            top: 1.2rem;
-            right: 1.5rem;
-            z-index: 1100;
         }
 
         /* Side Menu */
@@ -88,19 +119,13 @@
         }
         .side-menu a:hover { color: var(--primary-red); background: #2a2a40; }
 
-        /* Background Image - using your exact path */
-        body {
-            background: linear-gradient(rgba(15, 15, 26, 0.92), rgba(15, 15, 26, 0.92)), 
-                        url('/static/img/background.jpg') center/cover no-repeat fixed;
-        }
-
-        /* ==================== FOOTER ==================== */
+        /* Footer */
         .footer {
             background: #0a0a12;
             color: #888;
             text-align: center;
             padding: 1.8rem 1rem;
-            margin-top: auto;                    /* Pushes footer to bottom */
+            margin-top: auto;
             font-size: 0.95rem;
             border-top: 1px solid #333;
         }
@@ -108,9 +133,20 @@
 </head>
 <body>
 
+    <!-- Hero Header with Logo + Search -->
+    <header class="hero-header">
+        <div class="hero-content">
+            <a href="/" class="logo">Ticket2X</a>
+            <div class="search-bar">
+                <form method="get" action="{% url 'search' %}">
+                    <input type="text" name="q" placeholder="Search events..." value="{{ request.GET.q|default:'' }}">
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navbar -->
     <nav class="navbar">
-        <a href="/" class="logo">Ticket2X</a>
-        
         <div class="nav-links">
             {% if user.is_authenticated %}
                 <a href="/">Home</a>
@@ -119,13 +155,12 @@
                 {% endif %}
             {% endif %}
         </div>
-
         <div class="hamburger" id="hamburger">☰</div>
     </nav>
 
     <!-- Side Menu -->
     <div class="side-menu" id="side-menu">
-        <h2 style="color: var(--primary-red); margin-bottom: 2rem;">Menu</h2>
+        <h2 style="color: #ff5252; margin-bottom: 2rem;">Menu</h2>
         {% if user.is_authenticated %}
             <a href="/">🏠 Home</a>
             <a href="/bookings/my-tickets/">🎟️ Your Tickets</a>
@@ -147,7 +182,7 @@
     <!-- Footer -->
     <footer class="footer">
         &copy; {% now "Y" %} Ticket2X. All Rights Reserved.<br>
-        <span style="margin-top: 5px; display: inline-block;">Made by Wesa Mwiti</span>
+        <span style="margin-top: 5px; display: inline-block;">Made with ❤️ in Kenya</span>
     </footer>
 
     <script>
