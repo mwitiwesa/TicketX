@@ -21,61 +21,31 @@
             flex-direction: column;
         }
 
-        /* Hero Header */
+        /* Full Page Background - Correct path from root */
+        body {
+            background: linear-gradient(rgba(15, 15, 26, 0.90), rgba(15, 15, 26, 0.90)), 
+                        url('/static/img/background.jpg') center/cover no-repeat fixed;
+        }
+
+        /* Smaller Hero Header */
         .hero-header {
-            background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), 
+            background: linear-gradient(rgba(0, 0, 0, 0.78), rgba(0, 0, 0, 0.78)), 
                         url('/static/img/background.jpg') center/cover no-repeat;
-            height: 320px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            height: 200px;
             position: relative;
-            text-align: center;
         }
 
-        .logo {
-            font-size: 4.5rem;
-            font-weight: 900;
-            color: #ff5252;
-            text-shadow: 0 4px 20px rgba(0,0,0,0.9);
-            letter-spacing: 3px;
-        }
-
-        .tagline {
-            font-size: 1.35rem;
-            color: #ddd;
-            margin-top: 10px;
-            font-weight: 300;
-        }
-
-        /* Search Bar */
-        .search-bar {
-            width: 100%;
-            max-width: 580px;
-            margin: 20px auto 0;
-        }
-        .search-bar input {
-            width: 100%;
-            padding: 16px 24px;
-            font-size: 1.15rem;
-            border: none;
-            border-radius: 50px;
-            background: rgba(255,255,255,0.95);
-            color: #111;
-        }
-        .search-bar input:focus {
-            outline: none;
-            box-shadow: 0 0 0 5px rgba(255, 82, 82, 0.4);
-        }
-
-        /* Navbar */
-        .navbar {
-            background: #111;
-            padding: 1rem 2rem;
+        .top-bar {
+            background: rgba(0, 0, 0, 0.85);
+            padding: 0.8rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
         }
 
         .nav-links a {
@@ -92,29 +62,36 @@
             color: white;
         }
 
-        /* Side Menu */
-        .side-menu {
-            position: fixed;
-            top: 0;
-            right: -350px;
-            width: 320px;
-            height: 100%;
-            background: #1a1a2e;
-            transition: right 0.4s ease;
-            padding: 2.5rem 1.5rem;
-            box-shadow: -5px 0 25px rgba(0,0,0,0.7);
-            z-index: 2000;
+        .hero-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            width: 100%;
+            z-index: 5;
         }
-        .side-menu.open { right: 0; }
-        .side-menu a {
-            display: block;
-            padding: 1.1rem 0;
+
+        .welcome-text {
+            font-size: 1.35rem;
             color: #ddd;
-            text-decoration: none;
-            border-bottom: 1px solid #333;
-            font-size: 1.1rem;
+            margin-bottom: 8px;
         }
-        .side-menu a:hover { color: var(--primary-red); background: #2a2a40; }
+
+        .logo {
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: #ff5252;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.9);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 2rem 1rem;
+            max-width: 1280px;
+            margin: 0 auto;
+            flex: 1;
+        }
 
         /* Footer */
         .footer {
@@ -132,32 +109,23 @@
 
     <!-- Hero Header -->
     <header class="hero-header">
-        <div>
-            <a href="/" class="logo">TICKET2X</a>
-            <p class="tagline">Discover Events • Book Tickets • Enjoy Moments</p>
-            
-            <!-- Working Search Bar -->
-            <div class="search-bar">
-                <form method="get" action="{% url 'search' %}">
-                    <input type="text" name="q" placeholder="Search events, artists, or locations..." 
-                           value="{{ request.GET.q|default:'' }}">
-                </form>
+        <div class="top-bar">
+            <div class="nav-links">
+                {% if user.is_authenticated %}
+                    <a href="/">Home</a>
+                    {% if user.is_staff or user.is_superuser %}
+                        <a href="{% url 'admin:index' %}" style="color: #ffeb3b;">Admin Panel</a>
+                    {% endif %}
+                {% endif %}
             </div>
+            <div class="hamburger" id="hamburger">☰</div>
+        </div>
+
+        <div class="hero-content">
+            <div class="welcome-text">Welcome to</div>
+            <a href="/" class="logo">TICKET2X</a>
         </div>
     </header>
-
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="nav-links">
-            {% if user.is_authenticated %}
-                <a href="/">Home</a>
-                {% if user.is_staff or user.is_superuser %}
-                    <a href="{% url 'admin:index' %}" style="color: #ffeb3b;">Admin Panel</a>
-                {% endif %}
-            {% endif %}
-        </div>
-        <div class="hamburger" id="hamburger">☰</div>
-    </nav>
 
     <!-- Side Menu -->
     <div class="side-menu" id="side-menu">
@@ -176,7 +144,7 @@
     </div>
 
     <!-- Main Content -->
-    <div style="padding: 2rem 1rem; max-width: 1280px; margin: 0 auto; flex: 1;">
+    <div class="main-content">
         {% block content %}{% endblock %}
     </div>
 
