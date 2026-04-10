@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Home - TicketX{% endblock %}
+{% block title %}Home - Ticket2X{% endblock %}
 
 {% block content %}
 
@@ -17,7 +17,7 @@
       Welcome to Ticket2X
     </h1>
 
-    <!-- Events Today – Fixed slim rectangular cards -->
+    <!-- Events Today – Your original cards (kept untouched) -->
     <section class="mb-5">
       <h2 style="font-size: 1.8rem; text-align: center; margin-bottom: 1.8rem; color: #fff;">
         Events Today ({{ today|date:"F j, Y" }})
@@ -64,17 +64,16 @@
       {% endif %}
     </section>
 
-   
-  <!-- Upcoming Events – Horizontal Scrolling Cards -->
+    <!-- Upcoming Events – Fixed Horizontal Scrolling Cards -->
     <section class="upcoming-events mb-5">
       <h2 class="text-center mb-4" style="color: #ff5252; font-size: 1.9rem;">Upcoming Events</h2>
 
       {% if upcoming_events %}
         <div class="events-scroller" style="width: 100%; overflow: hidden; position: relative;">
-          <div class="events-track" style="display: flex; gap: 20px; animation: scrollLeft 45s linear infinite;">
+          <div class="events-track" style="display: flex; gap: 24px; animation: scrollLeft 50s linear infinite;">
             
             {% for event in upcoming_events %}
-              <div class="event-card flex-shrink-0" style="width: 310px; min-height: 390px;">
+              <div class="event-card flex-shrink-0" style="width: 310px; min-height: 400px;">
                 <div class="card bg-dark text-white border-0 shadow-lg h-100 position-relative overflow-hidden" style="border-radius: 16px;">
                   <!-- Image -->
                   <div style="position: absolute; inset: 0; background: {% if event.image %}url('{{ event.image.url }}'){% else %}#222{% endif %} center center / cover no-repeat;"></div>
@@ -83,7 +82,7 @@
                   <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.85) 40%, rgba(0,0,0,0.35) 80%); z-index: 1;"></div>
 
                   <!-- Content -->
-                  <div class="card-body d-flex flex-column position-relative" style="z-index: 2; padding: 1.5rem;">
+                  <div class="card-body d-flex flex-column position-relative" style="z-index: 2; padding: 1.6rem;">
                     <div class="mt-auto">
                       <h5 style="font-size: 1.35rem; font-weight: bold; text-shadow: 0 2px 6px rgba(0,0,0,0.9); margin-bottom: 0.8rem;">
                         {{ event.title }}
@@ -105,11 +104,11 @@
 
             <!-- Duplicate for seamless infinite scroll -->
             {% for event in upcoming_events %}
-              <div class="event-card flex-shrink-0" style="width: 310px; min-height: 390px;">
+              <div class="event-card flex-shrink-0" style="width: 310px; min-height: 400px;">
                 <div class="card bg-dark text-white border-0 shadow-lg h-100 position-relative overflow-hidden" style="border-radius: 16px;">
                   <div style="position: absolute; inset: 0; background: {% if event.image %}url('{{ event.image.url }}'){% else %}#222{% endif %} center center / cover no-repeat;"></div>
                   <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.85) 40%, rgba(0,0,0,0.35) 80%); z-index: 1;"></div>
-                  <div class="card-body d-flex flex-column position-relative" style="z-index: 2; padding: 1.5rem;">
+                  <div class="card-body d-flex flex-column position-relative" style="z-index: 2; padding: 1.6rem;">
                     <div class="mt-auto">
                       <h5 style="font-size: 1.35rem; font-weight: bold; text-shadow: 0 2px 6px rgba(0,0,0,0.9); margin-bottom: 0.8rem;">
                         {{ event.title }}
@@ -135,37 +134,6 @@
         <p class="text-center text-muted">No upcoming events yet. Check back soon!</p>
       {% endif %}
     </section>
-
-    <!-- Carousel Styles – adjust speed here -->
-    <style>
-      .events-scroller {
-        width: 100%;
-        overflow: hidden;
-      }
-      .events-track {
-        display: flex;
-        animation: scrollLeft 25s linear infinite;  /* ← Change this number to adjust speed:
-                                                       - 15s = very fast
-                                                       - 20s = fast
-                                                       - 25s = medium-fast (recommended)
-                                                       - 35s = moderate
-                                                       - 45s+ = slow */
-        will-change: transform;
-      }
-      .events-track:hover {
-        animation-play-state: paused;
-      }
-      @keyframes scrollLeft {
-        0% { transform: translateX(0); }
-        100% { transform: translateX(-50%); }
-      }
-      .event-card {
-        transition: transform 0.3s ease;
-      }
-      .event-card:hover {
-        transform: scale(1.05);
-      }
-    </style>
 
     <!-- Calendar Section -->
     <section style="background: rgba(20, 20, 30, 0.9); color: #eee; padding: 1.8rem; border-radius: 12px; max-width: 900px; margin: 0 auto;">
@@ -207,6 +175,31 @@
     </section>
 
   </div>
+
+  <!-- Carousel Styles -->
+  <style>
+    .events-scroller {
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+    .events-track {
+      display: flex;
+      gap: 24px;
+      animation: scrollLeft 50s linear infinite;
+    }
+    .events-track:hover {
+      animation-play-state: paused;
+    }
+    @keyframes scrollLeft {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .event-card:hover {
+      transform: scale(1.04);
+      transition: transform 0.3s ease;
+    }
+  </style>
 
   <!-- Calendar JS -->
   <script>
@@ -251,28 +244,5 @@
       color: #ff9999 !important;
     }
   </style>
-<!-- Carousel Styles -->
-<style>
-  .events-scroller {
-    width: 100%;
-    overflow: hidden;
-    position: relative;
-  }
-  .events-track {
-    display: flex;
-    gap: 20px;
-    animation: scrollLeft 45s linear infinite;
-  }
-  .events-track:hover {
-    animation-play-state: paused;
-  }
-  @keyframes scrollLeft {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-  }
-  .event-card:hover {
-    transform: scale(1.04);
-    transition: transform 0.3s ease;
-  }
-</style>
+
 {% endblock %}
