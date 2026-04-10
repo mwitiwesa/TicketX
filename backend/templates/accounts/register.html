@@ -36,14 +36,18 @@
       <!-- Much Bigger Email Input Box -->
       <div style="margin-bottom: 2.2rem;">
         <label style="display: block; margin-bottom: 0.8rem; color: #d8d7d7; font-size: 1.25rem;">Email Address</label>
-        {{ form.email }}
+        <input type="email" name="email" id="id_email" required
+               style="width: 100%; padding: 18px 16px; font-size: 1.25rem; 
+                      background: #1e1e2e; color: white; border: 1px solid #555; border-radius: 8px;">
       </div>
 
       <!-- Much Bigger Password Input Box with Eye Inside -->
       <div style="margin-bottom: 2.2rem; position: relative;">
         <label style="display: block; margin-bottom: 0.8rem; color: #ccc; font-size: 1.25rem;">Password</label>
         <div style="position: relative;">
-          {{ form.password1 }}
+          <input type="password" name="password1" id="id_password1" required
+                 style="width: 100%; padding: 18px 16px; font-size: 1.25rem; 
+                        background: #1e1e2e; color: white; border: 1px solid #555; border-radius: 8px;">
           <span onclick="togglePassword('id_password1', this)" 
                 style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); 
                        cursor: pointer; color: #aaa; font-size: 1.9rem; z-index: 10;">
@@ -56,7 +60,9 @@
       <div style="margin-bottom: 2.5rem; position: relative;">
         <label style="display: block; margin-bottom: 0.8rem; color: #ccc; font-size: 1.25rem;">Confirm Password</label>
         <div style="position: relative;">
-          {{ form.password2 }}
+          <input type="password" name="password2" id="id_password2" required
+                 style="width: 100%; padding: 18px 16px; font-size: 1.25rem; 
+                        background: #1e1e2e; color: white; border: 1px solid #555; border-radius: 8px;">
           <span onclick="togglePassword('id_password2', this)" 
                 style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); 
                        cursor: pointer; color: #aaa; font-size: 1.9rem; z-index: 10;">
