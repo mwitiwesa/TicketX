@@ -19,9 +19,11 @@
             font-family: Arial, sans-serif;
             color: #eee;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;           /* Important for footer */
         }
 
-        /* Navbar */
+        /* ==================== NAVBAR ==================== */
         .navbar {
             background: var(--nav-bg);
             padding: 1rem 2rem;
@@ -86,10 +88,21 @@
         }
         .side-menu a:hover { color: var(--primary-red); background: #2a2a40; }
 
-        /* Background Image */
+        /* Background Image - using your exact path */
         body {
             background: linear-gradient(rgba(15, 15, 26, 0.92), rgba(15, 15, 26, 0.92)), 
                         url('{% static "img/background.jpg" %}') center/cover no-repeat fixed;
+        }
+
+        /* ==================== FOOTER ==================== */
+        .footer {
+            background: #0a0a12;
+            color: #888;
+            text-align: center;
+            padding: 1.8rem 1rem;
+            margin-top: auto;                    /* Pushes footer to bottom */
+            font-size: 0.95rem;
+            border-top: 1px solid #333;
         }
     </style>
 </head>
@@ -126,9 +139,16 @@
         {% endif %}
     </div>
 
-    <div style="padding: 2rem 1rem; max-width: 1280px; margin: 0 auto;">
+    <!-- Main Content -->
+    <div style="padding: 2rem 1rem; max-width: 1280px; margin: 0 auto; flex: 1;">
         {% block content %}{% endblock %}
     </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        &copy; {% now "Y" %} Ticket2X. All Rights Reserved.<br>
+        <span style="margin-top: 5px; display: inline-block;">Made by Wesa Mwiti</span>
+    </footer>
 
     <script>
         const hamburger = document.getElementById('hamburger');
