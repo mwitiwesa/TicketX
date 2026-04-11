@@ -17,9 +17,9 @@
           </div>
         {% endif %}
 
-        <!-- Long, Spacious & Professional Card -->
+        <!-- Long, Elegant & Professional Card -->
         <div class="card shadow-lg border-0" style="border-radius: 24px; background: #0f0f17; 
-                    box-shadow: 0 0 60px rgba(255, 82, 82, 0.35); border: 2px solid #ff5252; min-height: 720px;">
+                    box-shadow: 0 0 60px rgba(255, 82, 82, 0.35); border: 2px solid #ff5252; min-height: 740px;">
 
           <div class="card-header text-center py-5" style="background: linear-gradient(135deg, #d32f2f, #b71c1c); color: white; border-radius: 22px 22px 0 0;">
             <h2 class="mb-0" style="font-size: 2.1rem; font-weight: 700;">Complete Your Payment</h2>
@@ -34,7 +34,7 @@
               </h4>
               <p class="text-muted mb-4" style="font-size: 1.2rem;">{{ booking.ticket.event.title }}</p>
               
-              <div style="background: #1a1a24; padding: 1.2rem; border-radius: 12px;">
+              <div style="background: #1a1a24; padding: 1.3rem; border-radius: 12px;">
                 <p class="mb-1 text-muted">Original Price</p>
                 <p class="h4 fw-bold text-white mb-0">
                   KES {{ booking.total_price|floatformat:2 }}
@@ -72,7 +72,7 @@
               </p>
             </div>
 
-            <hr style="border-color: #333; margin: 2.5rem 0;">
+            <hr style="border-color: #333; margin: 2.8rem 0 2.5rem 0;">
 
             <!-- Payment Methods -->
             <h5 class="text-center mb-4 text-white fw-bold">Choose Payment Method</h5>
@@ -95,7 +95,7 @@
               </button>
             </form>
 
-            <!-- Card & Bank -->
+            <!-- Card & Bank  -->
             <div class="d-grid gap-3">
               <a href="{% url 'bookings:card_payment' booking.id %}" 
                  class="btn btn-primary btn-lg py-3 fw-bold" 
@@ -110,9 +110,9 @@
               </a>
             </div>
 
-            <!-- Footer Note -->
-            <div class="text-center mt-5 pt-4">
-              <small class="text-muted">
+            <!-- Footer Note - More breathing room -->
+            <div class="text-center mt-auto pt-5 pb-3">
+              <small class="text-muted" style="line-height: 1.7;">
                 Booking is reserved until payment is completed.<br>
                 All payments are secure and encrypted.
               </small>
