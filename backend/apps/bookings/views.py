@@ -286,24 +286,83 @@ def qr_scanner(request):
 @csrf_exempt
 def validate_qr(request):
     if request.method == 'POST':
-        qr_data = request.POST.get('qr_data', '')
-        if not qr_data.startswith('https://') or '?ticket=' not in qr_data:
-            return JsonResponse({'valid': False, 'message': 'Invalid QR format'})
-
         try:
-            ticket_part = qr_data.split('?ticket=')[1]
-            booking_id, idx, token = ticket_part.split('-')
-            booking = Booking.objects.get(id=booking_id)
-            return JsonResponse({
-                'valid': True,
-                'booking_id': booking.id,
-                'ticket_index': int(idx),
-                'message': f'Valid ticket #{idx} - {booking.ticket.event.title}'
-            })
-        except (ValueError, Booking.DoesNotExist):
-            return JsonResponse({'valid': False, 'message': 'Ticket not found or invalid'})
+            data = json.loads(request.body)
+            qr_data = data.get('qr_data', '')
+            action = data.get('action')
 
-    return JsonResponse({'valid': False, 'message': 'Invalid request'})
+            if not qr_data or '?ticket=' not in qr_data:
+                TicketScan.objects.create(
+                    booking_id=0,
+                    ticket_index=0,
+                    scanned_by=request.user,
+                    status='invalid',
+                    message='Invalid QR format'
+                )
+                return JsonResponse({'valid': False, 'message': 'Invalid QR code format'})
+
+            ticket_part = qr_data.split('?ticket=')[1]
+            booking_id_str, idx_str, token = ticket_part.split('-')
+            booking_id = int(booking_id_str)
+            ticket_index = int(idx_str)
+
+            booking = get_object_or_404(Booking, id=booking_id)
+
+            # Create scan log
+            scan_log = TicketScan.objects.create(
+                booking=booking,
+                ticket_index=ticket_index,
+                scanned_by=request.user,
+                status='invalid',
+                message=''
+            )
+
+            if booking.scanned:
+                scan_log.status = 'already_used'
+                scan_log.message = f'Ticket already used on {booking.scanned_at.strftime("%d %b %Y at %H:%M")}'
+                scan_log.save()
+                return JsonResponse({'valid': False, 'message': scan_log.message})
+
+            if booking.latest_qr_token != token:
+                scan_log.status = 'outdated'
+                scan_log.message = 'This QR code is outdated. Please download the ticket again for a new valid QR.'
+                scan_log.save()
+                return JsonResponse({'valid': False, 'message': scan_log.message})
+
+            # Valid scan
+            if not action:
+                scan_log.status = 'success'
+                scan_log.message = f'VALID TICKET #{ticket_index} • {booking.ticket.event.title}'
+                scan_log.save()
+                return JsonResponse({
+                    'valid': True,
+                    'booking_id': booking.id,
+                    'ticket_index': ticket_index,
+                    'message': scan_log.message
+                })
+
+            # Approve action
+            if action == 'approve':
+                booking.scanned = True
+                booking.scanned_at = timezone.now()
+                booking.status = 'USED'
+                booking.save()
+
+                scan_log.status = 'success'
+                scan_log.message = f'Entry Approved - Ticket #{ticket_index}'
+                scan_log.save()
+
+                return JsonResponse({
+                    'success': True,
+                    'message': f'✓ Entry Approved! Ticket #{ticket_index} marked as USED.'
+                })
+
+            return JsonResponse({'success': True, 'message': 'Action recorded'})
+
+        except Exception:
+            return JsonResponse({'valid': False, 'message': 'Error processing QR code'})
+
+    return JsonResponse({'valid': False, 'message': 'Invalid request method'})
 
 
 # ──────────────────────────────────────────────

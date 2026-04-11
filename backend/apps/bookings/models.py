@@ -2,7 +2,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
-
+from django.contrib.auth.models import User
 from apps.events.models import Ticket
 
 
@@ -94,3 +94,31 @@ class PromoCode(models.Model):
 
     def __str__(self):
         return f"{self.code} ({self.discount_percent}% - {self.event.title})"
+   
+class TicketScan(models.Model):
+    booking = models.ForeignKey('Booking', on_delete=models.CASCADE, related_name='scans')
+    ticket_index = models.PositiveIntegerField()          # e.g., 1, 2, 3 for multi-ticket bookings
+    scanned_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        verbose_name="Scanned By"
+    )
+    scanned_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=[
+        ('success', 'Success'),
+        ('already_used', 'Already Used'),
+        ('outdated', 'Outdated QR'),
+        ('invalid', 'Invalid QR'),
+    ], default='invalid')
+    message = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ['-scanned_at']
+        verbose_name = "Ticket Scan Log"
+        verbose_name_plural = "Ticket Scan Logs"
+
+    def __str__(self):
+        user_name = self.scanned_by.get_full_name() or self.scanned_by.email if self.scanned_by else "Unknown"
+        return f"{user_name} scanned booking {self.booking.id} - {self.status}"
