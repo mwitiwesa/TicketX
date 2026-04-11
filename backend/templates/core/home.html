@@ -5,15 +5,8 @@
 
 {% block content %}
 
-  <!-- Background -->
-  <div style="position: fixed; inset: 0; width: 100%; height: 100%; 
-              background: url('{% static 'img/background.jpg' %}') no-repeat center center / cover;
-              filter: blur(8px); opacity: 0.90; z-index: -2;"></div>
-
   <!-- Main content -->
   <div style="position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 2rem 1rem;">
-
-    
 
     <!-- Events Today -->
     <section class="mb-5">
@@ -56,13 +49,20 @@
       {% endif %}
     </section>
 
-    <!-- Upcoming Events - Clean Horizontal Scroll -->
+    <!-- Upcoming Events with Scroll Buttons -->
     <section class="upcoming-events mb-5">
-      <h2 class="text-center mb-4" style="color: #ff5252; font-size: 1.9rem;">Upcoming Events</h2>
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.2rem;">
+        <h2 style="color: #ff5252; font-size: 1.9rem; margin: 0;">Upcoming Events</h2>
+        
+        <div>
+          <button onclick="scrollLeft()" style="background: #333; color: white; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 1.4rem; cursor: pointer; margin-right: 8px;">←</button>
+          <button onclick="scrollRight()" style="background: #333; color: white; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 1.4rem; cursor: pointer;">→</button>
+        </div>
+      </div>
 
       {% if upcoming_events %}
-        <div class="events-scroller" style="overflow: hidden; position: relative;">
-          <div class="events-track" style="display: flex; gap: 24px; animation: scrollLeft 55s linear infinite;">
+        <div id="events-scroller" style="overflow: hidden; position: relative;">
+          <div id="events-track" style="display: flex; gap: 24px; transition: transform 0.4s ease;">
             {% for event in upcoming_events %}
               <div class="event-card" style="width: 310px; flex-shrink: 0;">
                 <div style="border-radius: 16px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.6); position: relative; height: 400px;">
@@ -127,50 +127,17 @@
 
   </div>
 
-  <!-- Carousel Styles -->
-  <style>
-    .events-scroller {
-      width: 100%;
-      overflow: hidden;
-      position: relative;
-    }
-    .events-track {
-      display: flex;
-      gap: 24px;
-      animation: scrollLeft 55s linear infinite;
-    }
-    .events-track:hover {
-      animation-play-state: paused;
-    }
-    @keyframes scrollLeft {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
-    }
-  </style>
-
-  <!-- Calendar JS and styling (kept as you had) -->
   <script>
-    document.querySelectorAll('.day[data-day]').forEach(day => {
-      day.addEventListener('click', function() {
-        const year = this.dataset.year;
-        const month = this.dataset.month;
-        const dayNum = this.dataset.day;
+    // Scroll functions for Upcoming Events
+    function scrollLeft() {
+      const track = document.getElementById('events-track');
+      track.scrollBy({ left: -340, behavior: 'smooth' });
+    }
 
-        fetch(`/calendar/events/?year=${year}&month=${month}&day=${dayNum}`)
-          .then(response => response.json())
-          .then(data => {
-            const target = document.getElementById('day-events');
-            if (data.html) {
-              target.innerHTML = data.html;
-            } else if (data.error) {
-              target.innerHTML = '<p style="color:#ff6666;">' + data.error + '</p>';
-            }
-          })
-          .catch(() => {
-            document.getElementById('day-events').innerHTML = '<p style="color:#ff6666;">Failed to load events</p>';
-          });
-      });
-    });
+    function scrollRight() {
+      const track = document.getElementById('events-track');
+      track.scrollBy({ left: 340, behavior: 'smooth' });
+    }
   </script>
 
   <style>
