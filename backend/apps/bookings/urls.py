@@ -14,4 +14,6 @@ urlpatterns = [
     #path('ticket-action/<int:booking_id>/', views.ticket_action, name='ticket_action'),
     path('generate-promo/<int:event_id>/', views.generate_promo_code, name='generate_promo_code'),
     path('my-tickets/', views.my_tickets, name='my_tickets'),
+    path('checkout/<int:booking_id>/card/', views.card_payment, name='card_payment'),
+    path('checkout/<int:booking_id>/bank/', views.bank_payment, name='bank_payment'),
 ]

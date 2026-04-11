@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Card Payment - Ticket2X{% endblock %}
+
+{% block content %}
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-5">
+        <div class="card shadow-lg" style="background: #0f0f17; border: 2px solid #1976d2; border-radius: 20px;">
+          <div class="card-header text-center py-4" style="background: #1976d2; color: white;">
+            <h3>💳 Pay with Card</h3>
+          </div>
+          <div class="card-body p-5 text-center">
+            <h5 class="mb-4">{{ booking.ticket.event.title }}</h5>
+            <p class="display-5 fw-bold text-primary">KES {{ final_total|floatformat:2 }}</p>
+            
+            <div class="mt-5">
+              <p class="text-muted">Card payment integration with Buni is coming soon.</p>
+              <p class="text-muted">For now, this page is ready for when we activate Buni on Monday.</p>
+            </div>
+
+            <a href="{% url 'bookings:checkout' booking.id %}" class="btn btn-secondary mt-4">
+              ← Back to Checkout
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

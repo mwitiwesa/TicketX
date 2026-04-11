@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Bank Transfer - Ticket2X{% endblock %}
+
+{% block content %}
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-6">
+        <div class="card shadow-lg" style="background: #0f0f17; border: 2px solid #455a64; border-radius: 20px;">
+          <div class="card-header text-center py-4" style="background: #455a64; color: white;">
+            <h3>🏦 Pay with Bank Transfer</h3>
+          </div>
+          <div class="card-body p-5">
+            <h5 class="text-center mb-4">{{ booking.ticket.event.title }}</h5>
+            <p class="display-5 fw-bold text-center text-white">KES {{ final_total|floatformat:2 }}</p>
+            
+            <div class="mt-5 p-4" style="background: #1a1a24; border-radius: 12px;">
+              <p class="text-muted">Bank transfer details will be shown here once configured.</p>
+              <p class="text-muted">We will activate this properly with Buni on Monday.</p>
+            </div>
+
+            <div class="text-center mt-4">
+              <a href="{% url 'bookings:checkout' booking.id %}" class="btn btn-secondary">
+                ← Back to Checkout
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -349,3 +349,28 @@ def my_tickets(request):
         'bookings': bookings,
     }
     return render(request, 'bookings/my_tickets.html', context)
+
+# ====================== NEW PAYMENT VIEWS ======================
+
+@login_required
+def card_payment(request, booking_id):
+    """Placeholder for Card Payment (Buni integration coming on Monday)"""
+    booking = get_object_or_404(Booking, id=booking_id, user=request.user)
+    
+    context = {
+        'booking': booking,
+        'final_total': booking.total_price,
+    }
+    return render(request, 'bookings/card_payment.html', context)
+
+
+@login_required
+def bank_payment(request, booking_id):
+    """Placeholder for Bank Transfer Payment (Buni integration coming on Monday)"""
+    booking = get_object_or_404(Booking, id=booking_id, user=request.user)
+    
+    context = {
+        'booking': booking,
+        'final_total': booking.total_price,
+    }
+    return render(request, 'bookings/bank_payment.html', context)
