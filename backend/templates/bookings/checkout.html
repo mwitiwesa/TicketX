@@ -19,7 +19,7 @@
 
         <!-- Long, Elegant & Professional Card -->
         <div class="card shadow-lg border-0" style="border-radius: 24px; background: #0f0f17; 
-                    box-shadow: 0 0 60px rgba(255, 82, 82, 0.35); border: 2px solid #ff5252; min-height: 740px;">
+                    box-shadow: 0 0 60px rgba(255, 82, 82, 0.35); border: 2px solid #ff5252; min-height: 760px;">
 
           <div class="card-header text-center py-5" style="background: linear-gradient(135deg, #d32f2f, #b71c1c); color: white; border-radius: 22px 22px 0 0;">
             <h2 class="mb-0" style="font-size: 2.1rem; font-weight: 700;">Complete Your Payment</h2>
@@ -75,18 +75,18 @@
             <hr style="border-color: #333; margin: 2.8rem 0 2.5rem 0;">
 
             <!-- Payment Methods -->
-            <h5 class="text-center mb-4 text-white fw-bold">Choose Payment Method</h5>
+            <h4 class="text-center mb-5 text-white fw-bold" style="font-size: 1.65rem;">Choose Payment Method</h4>
 
             <!-- M-Pesa -->
             <form method="post" action="{% url 'bookings:checkout' booking.id %}" class="mb-5">
               {% csrf_token %}
               <div class="mb-4">
-                <label class="form-label fw-bold text-light mb-3">M-Pesa Phone Number</label>
+                <label class="form-label fw-bold text-light mb-3" style="font-size: 1.25rem;">M-Pesa Phone Number</label>
                 <input type="tel" name="phone" id="phone" required
                        placeholder="2547xxxxxxxx" pattern="254[0-9]{9}"
                        class="form-control form-control-lg text-center"
                        style="background: #1a1a24; color: #eee; border: 1px solid #444; border-radius: 12px; padding: 1.1rem;">
-                <small class="text-muted d-block mt-3 text-center">
+                <small class="text-muted d-block mt-3 text-center" style="font-size: 1.05rem;">
                   You will receive a prompt on your phone to enter your PIN.
                 </small>
               </div>
@@ -95,25 +95,27 @@
               </button>
             </form>
 
-            <!-- Card & Bank  -->
-            <div class="d-grid gap-3">
+            <!-- Card & Bank - Each on its own line -->
+            <div class="d-grid gap-3 mb-5">
               <a href="{% url 'bookings:card_payment' booking.id %}" 
                  class="btn btn-primary btn-lg py-3 fw-bold" 
-                 style="font-size: 1.28rem; border-radius: 12px; background: #1976d2; border: none;">
+                 style="font-size: 1.32rem; border-radius: 12px; background: #1976d2; border: none;">
                 💳 Pay with Card
               </a>
 
               <a href="{% url 'bookings:bank_payment' booking.id %}" 
                  class="btn btn-secondary btn-lg py-3 fw-bold" 
-                 style="font-size: 1.28rem; border-radius: 12px; background: #455a64; border: none;">
+                 style="font-size: 1.32rem; border-radius: 12px; background: #455a64; border: none;">
                 🏦 Pay with Bank Transfer
               </a>
             </div>
 
-            <!-- Footer Note - More breathing room -->
-            <div class="text-center mt-auto pt-5 pb-3">
-              <small class="text-muted" style="line-height: 1.7;">
-                Booking is reserved until payment is completed.<br>
+            <!-- Footer Notes - Larger and well spaced -->
+            <div class="text-center mt-auto pt-4">
+              <p class="text-light mb-3" style="font-size: 1.15rem; line-height: 1.6;">
+                Booking is reserved until payment is completed.
+              </p>
+              <small class="text-muted" style="font-size: 1.05rem; line-height: 1.7;">
                 All payments are secure and encrypted.
               </small>
             </div>
