@@ -152,16 +152,18 @@ def booking_detail(request, booking_id):
 @login_required
 def download_tickets(request, booking_id):
     """
-    Generate PDF tickets with:
-    - Front: event poster background + ticket type + attendee name
-    - Back: event details + UNIQUE QR code (new every download)
-    - QR code raised higher to avoid overlapping footer
+    Generate PDF tickets. ONLY the most recent download's QR code is valid.
     """
     booking = get_object_or_404(Booking, id=booking_id, user=request.user)
 
     if not booking.is_paid:
         messages.error(request, "Tickets can only be downloaded after payment.")
         return redirect('bookings:booking_detail', booking_id=booking.id)
+
+    # Generate and SAVE the new token
+    new_token = str(uuid.uuid4())[:12]
+    booking.latest_qr_token = new_token
+    booking.save(update_fields=['latest_qr_token'])   # Only update this field
 
     buffer = io.BytesIO()
     pdf = canvas.Canvas(buffer, pagesize=(85*mm, 55*mm))
@@ -176,11 +178,9 @@ def download_tickets(request, booking_id):
 
     if booking.quantity == 1 or not attendee_data:
         user = booking.user
-        if hasattr(user, 'first_name') and hasattr(user, 'last_name'):
-            buyer_name = f"{user.first_name} {user.last_name}".strip()
-        else:
-            email_prefix = user.email.split('@')[0]
-            buyer_name = email_prefix.replace('.', ' ').replace('_', ' ').title()
+        buyer_name = f"{getattr(user, 'first_name', '')} {getattr(user, 'last_name', '')}".strip()
+        if not buyer_name:
+            buyer_name = user.email.split('@')[0].replace('.', ' ').replace('_', ' ').title()
         names = [buyer_name or "Attendee"]
     else:
         names = attendee_data[:booking.quantity]
@@ -188,16 +188,11 @@ def download_tickets(request, booking_id):
     for idx, attendee in enumerate(names):
         pdf.setPageSize((85*mm, 55*mm))
 
+        # Front
         if booking.ticket.event.image:
             try:
                 img_path = booking.ticket.event.image.path
-                img = PILImage.open(img_path)
-                scale = max(85*mm / img.width, 55*mm / img.height)
-                w = img.width * scale
-                h = img.height * scale
-                x = (85*mm - w) / 2
-                y = (55*mm - h) / 2
-                pdf.drawInlineImage(img_path, x, y, width=w, height=h)
+                pdf.drawInlineImage(img_path, 0, 0, width=85*mm, height=55*mm)
             except:
                 pdf.setFillColor(black)
                 pdf.rect(0, 0, 85*mm, 55*mm, fill=1)
@@ -214,8 +209,8 @@ def download_tickets(request, booking_id):
 
         pdf.showPage()
 
+        # Back
         pdf.setPageSize((85*mm, 55*mm))
-
         pdf.setFillColorRGB(10/255, 10/255, 35/255)
         pdf.rect(0, 0, 85*mm, 55*mm, fill=1)
 
@@ -242,10 +237,10 @@ def download_tickets(request, booking_id):
 
         pdf.setFont("Helvetica-Oblique", 7)
         pdf.setFillColor(lightgrey)
-        pdf.drawCentredString(42.5*mm, 8*mm, "Ticket2X.com developed by Wesa Mwiti")
+        pdf.drawCentredString(42.5*mm, 8*mm, "Ticket2X.com")
 
-        random_token = str(uuid.uuid4())[:8]
-        qr_data = f"https://{request.get_host()}/events/{booking.ticket.event.id}/?ticket={booking.id}-{idx+1}-{random_token}"
+        # QR Code using the newly saved token
+        qr_data = f"https://{request.get_host()}/events/{booking.ticket.event.id}/?ticket={booking.id}-{idx+1}-{new_token}"
 
         qr = qrcode.QRCode(version=1, box_size=5, border=2)
         qr.add_data(qr_data)
@@ -255,14 +250,13 @@ def download_tickets(request, booking_id):
         qr_buffer = BytesIO()
         qr_img.save(qr_buffer, format="PNG")
         qr_buffer.seek(0)
-
         qr_pil = PILImage.open(qr_buffer)
 
         pdf.drawInlineImage(qr_pil, 58*mm, 16*mm, width=22*mm, height=22*mm)
 
         pdf.setFont("Helvetica", 6)
         pdf.setFillColor(lightgrey)
-        pdf.drawCentredString(69*mm, 12*mm, "Scan to View Event")
+        pdf.drawCentredString(69*mm, 12*mm, "Scan to Validate")
 
         if idx < len(names) - 1:
             pdf.showPage()
