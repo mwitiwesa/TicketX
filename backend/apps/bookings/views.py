@@ -282,7 +282,6 @@ def validate_qr(request):
         return JsonResponse({'valid': False, 'message': 'Invalid request method'})
 
     try:
-        # Improved body reading
         body = request.body.decode('utf-8')
         if not body:
             raise ValueError("Empty request body")
@@ -291,34 +290,41 @@ def validate_qr(request):
         qr_data = data.get('qr_data', '').strip()
         action = data.get('action')
 
-        if not qr_data:
-            raise ValueError("No qr_data received")
-
-        if '?ticket=' not in qr_data:
+        if not qr_data or '?ticket=' not in qr_data:
             raise ValueError("Invalid QR format - missing ?ticket=")
 
-        # Parse the QR data
+        # Extract the ticket part safely
         ticket_part = qr_data.split('?ticket=')[1]
-        booking_id_str, idx_str, token = ticket_part.split('-')
+
+        # Split by '-' and take the last 3 parts to be safe
+        parts = ticket_part.split('-')
+        if len(parts) < 3:
+            raise ValueError("Invalid ticket data in QR")
+
+        booking_id_str = parts[0]
+        idx_str = parts[1]
+        token = '-'.join(parts[2:])        # Join the rest as token (in case token has '-')
+
         booking_id = int(booking_id_str)
         ticket_index = int(idx_str)
 
         booking = get_object_or_404(Booking, id=booking_id)
 
-        # === Your existing logic here (latest token + scanned check) ===
+        # Check if already scanned
         if booking.scanned:
             return JsonResponse({
                 'valid': False,
                 'message': f'Ticket already used on {booking.scanned_at.strftime("%d %b %Y at %H:%M")}'
             })
 
+        # Check if this is the latest QR token
         if booking.latest_qr_token != token:
             return JsonResponse({
                 'valid': False,
                 'message': 'This QR code is outdated. Please download the ticket again.'
             })
 
-        # Valid scan
+        # Valid latest QR - show actions
         if not action:
             return JsonResponse({
                 'valid': True,
@@ -340,13 +346,10 @@ def validate_qr(request):
 
         return JsonResponse({'success': True, 'message': 'Action recorded'})
 
-    except json.JSONDecodeError:
-        return JsonResponse({'valid': False, 'message': 'Invalid JSON format from scanner'})
-    except ValueError as e:
-        return JsonResponse({'valid': False, 'message': str(e)})
+    except (ValueError, IndexError, TypeError) as e:
+        return JsonResponse({'valid': False, 'message': f'Invalid QR data: {str(e)}'})
     except Exception as e:
-        # Log the real error so you can see it in Render logs
-        print("QR Scanner Error:", str(e))   # ← Check your server logs for this line
+        print("QR Scanner Error:", str(e))
         return JsonResponse({'valid': False, 'message': 'Error processing QR code'})
 
 # ──────────────────────────────────────────────
