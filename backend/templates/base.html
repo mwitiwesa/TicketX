@@ -11,7 +11,11 @@
         :root {
             --primary-red: #ff5252;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
 
         body {
             font-family: Arial, sans-serif;
@@ -20,19 +24,20 @@
             display: flex;
             flex-direction: column;
             background: #000000;
+            overflow-x: hidden;           /* Prevent horizontal scroll */
         }
 
-        /* Hero Header - Responsive */
+        /* Hero Header - Better on mobile */
         .hero-header {
             background: linear-gradient(rgba(0, 0, 0, 0.78), rgba(0, 0, 0, 0.78)), 
                         url('/static/img/background.jpg') center/cover no-repeat;
-            height: 240px;
+            height: 200px;
             position: relative;
         }
 
         .top-bar {
-            background: rgba(0, 0, 0, 0.85);
-            padding: 0.8rem 1rem;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 0.7rem 1rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -45,13 +50,13 @@
 
         .search-bar {
             flex: 1;
-            max-width: 480px;
-            margin: 0 15px;
+            max-width: 420px;
+            margin: 0 12px;
         }
         .search-bar input {
             width: 100%;
-            padding: 12px 16px;
-            font-size: 1.05rem;
+            padding: 11px 16px;
+            font-size: 1rem;
             border: none;
             border-radius: 30px;
             background: rgba(255,255,255,0.92);
@@ -59,9 +64,10 @@
         }
 
         .hamburger {
-            font-size: 1.9rem;
+            font-size: 1.8rem;
             cursor: pointer;
             color: white;
+            padding: 5px;
         }
 
         .hero-content {
@@ -75,31 +81,32 @@
         }
 
         .logo {
-            font-size: 3.2rem;
+            font-size: 2.8rem;
             font-weight: 900;
             color: #ff5252;
             text-shadow: 0 4px 20px rgba(0,0,0,0.9);
-            letter-spacing: 2px;
         }
 
         .main-content {
-            padding: 1.5rem 1rem;
+            padding: 1rem 0.8rem;
             max-width: 1280px;
             margin: 0 auto;
             flex: 1;
+            width: 100%;
         }
 
         .side-menu {
             position: fixed;
             top: 0;
-            right: -340px;
-            width: 300px;
+            right: -300px;
+            width: 280px;
             height: 100%;
             background: #1a1a2e;
             transition: right 0.4s ease;
-            padding: 2rem 1.5rem;
+            padding: 2rem 1.2rem;
             box-shadow: -5px 0 25px rgba(0,0,0,0.7);
             z-index: 2000;
+            overflow-y: auto;
         }
         .side-menu.open { right: 0; }
 
@@ -111,50 +118,38 @@
             border-bottom: 1px solid #333;
             font-size: 1.05rem;
         }
-        .side-menu a:hover { color: var(--primary-red); background: #2a2a40; }
+        .side-menu a:hover { 
+            color: var(--primary-red); 
+            background: #2a2a40; 
+        }
 
         .footer {
             background: #0a0a12;
             color: #888;
             text-align: center;
-            padding: 1.5rem 1rem;
+            padding: 1.4rem 1rem;
             margin-top: auto;
             font-size: 0.9rem;
             border-top: 1px solid #333;
         }
 
-        /* ====================== RESPONSIVE FIXES ====================== */
-        @media (max-width: 768px) {
-            .hero-header {
-                height: 180px;
-            }
-            .logo {
-                font-size: 2.6rem;
-            }
-            .main-content {
-                padding: 1rem 0.8rem;
-            }
-            .side-menu {
-                width: 280px;
-                right: -290px;
-            }
-            .search-bar {
-                margin: 0 10px;
-            }
-        }
-
-        @media (max-width: 480px) {
+        /* ====================== MOBILE RESPONSIVE ====================== */
+        @media (max-width: 576px) {
             .hero-header {
                 height: 160px;
             }
             .logo {
-                font-size: 2.3rem;
+                font-size: 2.4rem;
+            }
+            .main-content {
+                padding: 0.8rem 0.6rem;
+            }
+            .side-menu {
+                width: 260px;
+                right: -270px;
             }
             .top-bar {
-                padding: 0.7rem 0.8rem;
-            }
-            .hamburger {
-                font-size: 1.7rem;
+                padding: 0.6rem 0.8rem;
             }
         }
     </style>
