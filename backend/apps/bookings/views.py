@@ -281,89 +281,79 @@ def download_tickets(request, booking_id):
 def qr_scanner(request):
     return render(request, 'bookings/admin_qr_scanner.html')
 
-
 @staff_member_required
 @csrf_exempt
 def validate_qr(request):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            qr_data = data.get('qr_data', '')
-            action = data.get('action')
+    if request.method != 'POST':
+        return JsonResponse({'valid': False, 'message': 'Invalid request method'})
 
-            if not qr_data or '?ticket=' not in qr_data:
-                TicketScan.objects.create(
-                    booking_id=0,
-                    ticket_index=0,
-                    scanned_by=request.user,
-                    status='invalid',
-                    message='Invalid QR format'
-                )
-                return JsonResponse({'valid': False, 'message': 'Invalid QR code format'})
+    try:
+        # Improved body reading
+        body = request.body.decode('utf-8')
+        if not body:
+            raise ValueError("Empty request body")
 
-            ticket_part = qr_data.split('?ticket=')[1]
-            booking_id_str, idx_str, token = ticket_part.split('-')
-            booking_id = int(booking_id_str)
-            ticket_index = int(idx_str)
+        data = json.loads(body)
+        qr_data = data.get('qr_data', '').strip()
+        action = data.get('action')
 
-            booking = get_object_or_404(Booking, id=booking_id)
+        if not qr_data:
+            raise ValueError("No qr_data received")
 
-            # Create scan log
-            scan_log = TicketScan.objects.create(
-                booking=booking,
-                ticket_index=ticket_index,
-                scanned_by=request.user,
-                status='invalid',
-                message=''
-            )
+        if '?ticket=' not in qr_data:
+            raise ValueError("Invalid QR format - missing ?ticket=")
 
-            if booking.scanned:
-                scan_log.status = 'already_used'
-                scan_log.message = f'Ticket already used on {booking.scanned_at.strftime("%d %b %Y at %H:%M")}'
-                scan_log.save()
-                return JsonResponse({'valid': False, 'message': scan_log.message})
+        # Parse the QR data
+        ticket_part = qr_data.split('?ticket=')[1]
+        booking_id_str, idx_str, token = ticket_part.split('-')
+        booking_id = int(booking_id_str)
+        ticket_index = int(idx_str)
 
-            if booking.latest_qr_token != token:
-                scan_log.status = 'outdated'
-                scan_log.message = 'This QR code is outdated. Please download the ticket again for a new valid QR.'
-                scan_log.save()
-                return JsonResponse({'valid': False, 'message': scan_log.message})
+        booking = get_object_or_404(Booking, id=booking_id)
 
-            # Valid scan
-            if not action:
-                scan_log.status = 'success'
-                scan_log.message = f'VALID TICKET #{ticket_index} • {booking.ticket.event.title}'
-                scan_log.save()
-                return JsonResponse({
-                    'valid': True,
-                    'booking_id': booking.id,
-                    'ticket_index': ticket_index,
-                    'message': scan_log.message
-                })
+        # === Your existing logic here (latest token + scanned check) ===
+        if booking.scanned:
+            return JsonResponse({
+                'valid': False,
+                'message': f'Ticket already used on {booking.scanned_at.strftime("%d %b %Y at %H:%M")}'
+            })
 
-            # Approve action
-            if action == 'approve':
-                booking.scanned = True
-                booking.scanned_at = timezone.now()
-                booking.status = 'USED'
-                booking.save()
+        if booking.latest_qr_token != token:
+            return JsonResponse({
+                'valid': False,
+                'message': 'This QR code is outdated. Please download the ticket again.'
+            })
 
-                scan_log.status = 'success'
-                scan_log.message = f'Entry Approved - Ticket #{ticket_index}'
-                scan_log.save()
+        # Valid scan
+        if not action:
+            return JsonResponse({
+                'valid': True,
+                'booking_id': booking.id,
+                'ticket_index': ticket_index,
+                'message': f'VALID TICKET #{ticket_index} • {booking.ticket.event.title}'
+            })
 
-                return JsonResponse({
-                    'success': True,
-                    'message': f'✓ Entry Approved! Ticket #{ticket_index} marked as USED.'
-                })
+        # Approve
+        if action == 'approve':
+            booking.scanned = True
+            booking.scanned_at = timezone.now()
+            booking.status = 'USED'
+            booking.save()
+            return JsonResponse({
+                'success': True,
+                'message': f'✓ Entry Approved! Ticket #{ticket_index} marked as USED.'
+            })
 
-            return JsonResponse({'success': True, 'message': 'Action recorded'})
+        return JsonResponse({'success': True, 'message': 'Action recorded'})
 
-        except Exception:
-            return JsonResponse({'valid': False, 'message': 'Error processing QR code'})
-
-    return JsonResponse({'valid': False, 'message': 'Invalid request method'})
-
+    except json.JSONDecodeError:
+        return JsonResponse({'valid': False, 'message': 'Invalid JSON format from scanner'})
+    except ValueError as e:
+        return JsonResponse({'valid': False, 'message': str(e)})
+    except Exception as e:
+        # Log the real error so you can see it in Render logs
+        print("QR Scanner Error:", str(e))   # ← Check your server logs for this line
+        return JsonResponse({'valid': False, 'message': 'Error processing QR code'})
 
 # ──────────────────────────────────────────────
 # NEW: Admin view to generate random 6-digit promo code for a specific event

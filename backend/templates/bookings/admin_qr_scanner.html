@@ -64,17 +64,29 @@
         },
         body: JSON.stringify({ qr_data: data })
       })
-      .then(r => r.json())
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Server returned ' + response.status);
+        }
+        return response.json();
+      })
       .then(res => {
         const result = document.getElementById('result');
         const actions = document.getElementById('actions');
+        
         if (res.valid) {
-          result.innerHTML = `<span style="color:#4caf50; font-weight:bold;">VALID TICKET<br>${res.message}</span>`;
+          result.innerHTML = `<span style="color:#4caf50; font-weight:bold;">✓ VALID<br>${res.message}</span>`;
           actions.style.display = 'block';
+          currentData = data;
         } else {
-          result.innerHTML = `<span style="color:#f44336; font-weight:bold;">INVALID<br>${res.message}</span>`;
+          result.innerHTML = `<span style="color:#f44336; font-weight:bold;">✗ ${res.message}</span>`;
           actions.style.display = 'none';
         }
+      })
+      .catch(err => {
+        console.error(err);
+        document.getElementById('result').innerHTML = 
+        `<span style="color:red">Connection error or server issue.<br>Check console and server logs.</span>`;
       });
     }
 
