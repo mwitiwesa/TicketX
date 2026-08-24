@@ -7,7 +7,9 @@ import dj_database_url
 # ======================
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = os.environ.get(
+    'SECRET_KEY',
+    "django-insecure-local-development-key-change-me")
 
 DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
@@ -15,7 +17,7 @@ DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 # this lets Django understand the original request scheme.
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "ticket2x.onrender.com").split(",")
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "127.0.0.1, localhost, ticket2x.onrender.com").split(",")
 
 # ======================
 # APPLICATIONS
